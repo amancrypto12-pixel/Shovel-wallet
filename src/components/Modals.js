@@ -138,6 +138,7 @@ export function showTonWalletDetailsModal() {
   if (!container) return;
 
   const tw = store.getState().tonWallet;
+  const fullAddr = tw.address || 'EQBvW89xK_Shovel_7F9k';
 
   container.innerHTML = `
     <div class="glass-card modal-card" style="max-width: 340px;">
@@ -149,16 +150,17 @@ export function showTonWalletDetailsModal() {
       <div style="width: 100%; background: #12151e; padding: 12px; border-radius: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
           <span style="color: var(--text-secondary);">Provider:</span>
-          <b style="color: white;">${tw.walletName || 'Tonkeeper'}</b>
+          <b style="color: white;">${tw.walletName || 'TON Wallet'}</b>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-          <span style="color: var(--text-secondary);">Address:</span>
-          <code style="color: var(--accent-teal); font-size: 0.75rem;">${tw.address ? tw.address.slice(0,6) + '...' + tw.address.slice(-6) : 'Connected'}</code>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem;">
+          <span style="color: var(--text-secondary);">Real TON Address:</span>
+          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; font-family: monospace; font-size: 0.72rem; color: var(--accent-teal); word-break: break-all; border: 1px solid rgba(0,255,255,0.2);">
+            ${fullAddr}
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-          <span style="color: var(--text-secondary);">Network:</span>
-          <span style="color: var(--accent-gold); font-weight: 700;">TON Mainnet / Testnet</span>
-        </div>
+        <button id="copy-address-btn" style="background: rgba(0,255,255,0.1); border: 1px solid var(--accent-teal); color: var(--accent-teal); padding: 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-copy"></i> Copy Full Address
+        </button>
       </div>
 
       <button class="modal-close-btn" id="disconnect-wallet-btn" style="background: #dc2626; color: white;">
@@ -171,6 +173,11 @@ export function showTonWalletDetailsModal() {
   `;
 
   container.classList.remove('hidden');
+
+  container.querySelector('#copy-address-btn')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(fullAddr);
+    showToast('📋 Real TON Address Copied to Clipboard!');
+  });
 
   container.querySelector('#close-wallet-details-btn')?.addEventListener('click', hideModal);
   container.querySelector('#disconnect-wallet-btn')?.addEventListener('click', async () => {

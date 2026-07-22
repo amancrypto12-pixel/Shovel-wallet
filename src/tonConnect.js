@@ -1,4 +1,4 @@
-import { TonConnectUI } from '@tonconnect/ui';
+import { TonConnectUI, toUserFriendlyAddress } from '@tonconnect/ui';
 import { store } from './state.js';
 
 let tonConnectUIInstance = null;
@@ -16,9 +16,14 @@ export function initTonConnect() {
     // Listen to wallet status changes from TonConnect SDK
     tonConnectUIInstance.onStatusChange((wallet) => {
       if (wallet) {
-        const address = wallet.account.address;
+        let userFriendlyAddr = wallet.account.address;
+        try {
+          userFriendlyAddr = toUserFriendlyAddress(wallet.account.address);
+        } catch (e) {
+          // fallback to raw address if conversion fails
+        }
         const appName = wallet.device?.appName || wallet.name || 'TON Wallet';
-        store.connectTonWallet(appName, address);
+        store.connectTonWallet(appName, userFriendlyAddr);
       } else {
         store.disconnectTonWallet();
       }

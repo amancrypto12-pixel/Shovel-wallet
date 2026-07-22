@@ -55,7 +55,7 @@ export function renderPortfolioScreen(container) {
         
         <button class="wallet-act-btn" id="connect-ton-wallet-btn" style="background: ${isWalletConnected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0, 136, 204, 0.2)'}; border-color: ${isWalletConnected ? 'var(--accent-green)' : '#0088cc'}; color: ${isWalletConnected ? 'var(--accent-green)' : '#0088cc'}; font-weight: 800;">
           <i class="${isWalletConnected ? 'fa-solid fa-circle-check' : 'fa-solid fa-link'}"></i> 
-          ${isWalletConnected ? `${walletName}: ${walletAddr.slice(0, 4)}...` : 'Connect TON'}
+          ${isWalletConnected ? `${walletAddr.slice(0, 4)}...${walletAddr.slice(-4)}` : 'Connect TON'}
         </button>
       </div>
     </div>
