@@ -292,9 +292,11 @@ class StateStore {
       if (mining.active) {
         if (now >= mining.endTime) {
           this.claimMiningYield();
-        } else {
-          this.notify();
         }
+        // DO NOT call this.notify() here!
+        // MiningScreen handles its own 1-second tick updates internally.
+        // Calling notify() here was causing full DOM re-renders every second,
+        // which destroyed the navigation bar and broke scroll position.
       }
     }, 1000);
   }

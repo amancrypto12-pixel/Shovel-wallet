@@ -276,7 +276,7 @@ export function showRewardedAdModal(onAdComplete) {
 
   container.innerHTML = `
     <div class="glass-card modal-card" style="border-color: var(--accent-purple);">
-      <div class="modal-icon-hero" style="color: var(--accent-purple);"><i class="fa-solid fa-circle-play"></i></div>
+      <div class="modal-icon-hero" style="color: var(--accent-purple);"><i class="fa-solid fa-play"></i></div>
       <div class="modal-title">Shovel Video Ad Simulator</div>
       <div class="modal-text">
         Watching Partner Video Ad...
@@ -443,7 +443,7 @@ export function showFaucetModal() {
 
   container.innerHTML = `
     <div class="glass-card modal-card">
-      <div class="modal-icon-hero" style="color: #0088cc;"><i class="fa-solid fa-faucet-drip"></i></div>
+      <div class="modal-icon-hero" style="color: #0088cc;"><i class="fa-solid fa-droplet"></i></div>
       <div class="modal-title">Shovel Faucet</div>
       <div class="modal-text">
         Get free <b>+1.00 TON</b> tokens for swap gas fees and transactions! (24-Hour Cooldown)

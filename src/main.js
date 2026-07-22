@@ -1,7 +1,12 @@
 /* ==========================================================================
    APPLICATION ENTRY POINT & VIEW CONTROLLER (Shovel Wallet)
+   
+   CRITICAL FIX: Stop re-rendering header & navigation every second.
+   Only re-render the ACTIVE SCREEN content on mining tick updates.
+   Re-render header & navigation ONLY when activeTab changes.
    ========================================================================== */
 
+import './style.css';
 import { store } from './state.js';
 import { ParticleEngine } from './particles.js';
 import { renderHeader } from './components/Header.js';
@@ -18,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const particleCanvas = document.getElementById('particle-canvas');
   const particleEngine = new ParticleEngine(bgCanvas, particleCanvas);
 
-  // 2. Initialize Telegram WebApp SDK Simulation
+  // 2. Initialize Telegram WebApp SDK
   initTelegramWebApp();
 
   // 3. Cache Core Shell DOM Elements
@@ -27,51 +32,62 @@ document.addEventListener('DOMContentLoaded', () => {
   const navContainer = document.getElementById('app-nav');
 
   // 4. Initial Background Theme Application
-  applyBgThemeToDOM(store.getState().currentBgTheme || 'theme_bg1');
+  applyBgThemeToDOM(store.getState().currentBgTheme || 'theme_bg4');
 
-  // 5. Main View Router Function
+  // 5. Track the last rendered tab so we only re-render shell when tab changes
+  let lastRenderedTab = null;
+
+  // 6. Main View Router Function
   function renderApp(state) {
-    // Render Header & Navigation
-    renderHeader(headerContainer);
-    renderNavigation(navContainer);
+    const currentTab = state.activeTab;
 
-    // Apply Background Theme
-    applyBgThemeToDOM(state.currentBgTheme || 'theme_bg1');
+    // Only re-render header & navigation when the active tab actually changes
+    if (lastRenderedTab !== currentTab) {
+      renderHeader(headerContainer);
+      renderNavigation(navContainer);
+      applyBgThemeToDOM(state.currentBgTheme || 'theme_bg4');
+      lastRenderedTab = currentTab;
 
-    // Route active tab
-    switch (state.activeTab) {
-      case 'mining':
-        renderMiningScreen(viewportContainer, particleEngine);
-        break;
-      case 'swap':
-        renderSwapScreen(viewportContainer);
-        break;
-      case 'referrals':
-        renderReferralScreen(viewportContainer);
-        break;
-      case 'portfolio':
-        renderPortfolioScreen(viewportContainer);
-        break;
-      default:
-        renderMiningScreen(viewportContainer, particleEngine);
-        break;
+      // Route active tab — full screen render
+      switch (currentTab) {
+        case 'mining':
+          renderMiningScreen(viewportContainer, particleEngine);
+          break;
+        case 'swap':
+          renderSwapScreen(viewportContainer);
+          break;
+        case 'referrals':
+          renderReferralScreen(viewportContainer);
+          break;
+        case 'portfolio':
+          renderPortfolioScreen(viewportContainer);
+          break;
+        default:
+          renderMiningScreen(viewportContainer, particleEngine);
+          break;
+      }
+
+      // Scroll viewport to top on tab switch
+      viewportContainer.scrollTop = 0;
     }
+    // If tab hasn't changed, MiningScreen handles its own 1-second tick updates
+    // internally via setInterval — no DOM rebuild needed here.
 
-    // Trigger Welcome / Onboarding Modal if new user
-    if (!state.onboarded) {
+    // Trigger Welcome / Onboarding Modal if new user (only once)
+    if (!state.onboarded && !window._onboardingShown) {
+      window._onboardingShown = true;
       setTimeout(() => {
         showWelcomeModal();
       }, 500);
     }
   }
 
-  // 6. Subscribe to State Changes
+  // 7. Subscribe to State Changes
   store.subscribe((state) => {
-    // Render view when activeTab or structural state changes
     renderApp(state);
   });
 
-  // 7. Initial First Render
+  // 8. Initial First Render
   renderApp(store.getState());
 });
 

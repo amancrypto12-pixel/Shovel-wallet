@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Shovel Wallet — Mining & Swap DEX</title>
   <link rel="icon" type="image/png" href="/shovel_logo.png">
   
@@ -11,13 +11,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome Icons -->
+  <!-- FontAwesome Icons (FREE) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Telegram WebApp SDK Simulation / Polyfill -->
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <link rel="stylesheet" href="/src/style.css">
 </head>
 <body class="dark-theme">
   <!-- Interactive Canvas Background -->
@@ -34,13 +32,13 @@
 
     <!-- Bottom Navigation Bar injected by Navigation.js -->
     <nav id="app-nav" class="app-nav"></nav>
-
-    <!-- Global Modal Overlay Container -->
-    <div id="modal-container" class="modal-container hidden"></div>
-
-    <!-- Notification Toast Container -->
-    <div id="toast-container" class="toast-container"></div>
   </div>
+
+  <!-- Global Modal Overlay Container (OUTSIDE tg-app for proper z-index stacking) -->
+  <div id="modal-container" class="modal-container hidden"></div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
 
   <script type="module" src="/src/main.js"></script>
 </body>

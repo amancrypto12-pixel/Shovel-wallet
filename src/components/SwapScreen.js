@@ -1,5 +1,6 @@
 /* ==========================================================================
    SCREEN 2: TESTNET SWAP DEX (Shovel Wallet Multi-Currency & Quests)
+   FIX: Replace PRO-only icons with FREE alternatives.
    ========================================================================== */
 
 import { store } from '../state.js';
@@ -15,7 +16,7 @@ export function renderSwapScreen(container) {
 
   let fromToken = 'SHOVEL';
   let toToken = 'TON';
-  let fromAmount = 100; // Default to 100 SHOVEL for easy small swapping!
+  let fromAmount = 100;
 
   function calculateRate(fromSym, toSym) {
     const pFrom = TOKEN_MAP[fromSym]?.priceUsd || 1;
@@ -42,7 +43,7 @@ export function renderSwapScreen(container) {
     const toAmount = calculateToAmount(fromAmount);
     const fromBalance = state.balances[fromToken] || 0;
     const toBalance = state.balances[toToken] || 0;
-    const fee = 0.1; // 0.1 SHOVEL fee
+    const fee = 0.1;
     const requiredFrom = fromToken === 'SHOVEL' ? fromAmount + fee : fromAmount;
     const isInsufficient = requiredFrom > fromBalance;
     const isInvalid = !fromAmount || fromAmount <= 0;
@@ -55,7 +56,7 @@ export function renderSwapScreen(container) {
 
     container.innerHTML = `
       <div class="screen-header-title">
-        <i class="fa-solid fa-rotate" style="color: var(--accent-teal);"></i> Shovel DEX Swap
+        <i class="fa-solid fa-repeat" style="color: var(--accent-teal);"></i> Shovel DEX Swap
       </div>
 
       <!-- Swap Input Container Card -->
@@ -86,7 +87,7 @@ export function renderSwapScreen(container) {
         <!-- Reverse Swap Button -->
         <div class="swap-reverse-btn-wrapper">
           <button class="swap-reverse-btn" id="swap-reverse-trigger">
-            <i class="fa-solid fa-arrow-down-up"></i>
+            <i class="fa-solid fa-arrow-right-arrow-left" style="transform: rotate(90deg);"></i>
           </button>
         </div>
 
@@ -113,52 +114,52 @@ export function renderSwapScreen(container) {
         <span style="color: var(--accent-teal); font-weight: 700;">Fee: 0.1 SHOVEL</span>
       </div>
 
-      <!-- MAIN PROMINENT SWAP ACTION BUTTON (Front & Center!) -->
+      <!-- MAIN SWAP ACTION BUTTON -->
       <button class="main-swap-action-btn" id="execute-swap-btn" ${isInsufficient || isInvalid ? 'disabled' : ''}>
         ${buttonText}
       </button>
 
       <!-- Swap Milestone Tasks & Rewards Section -->
-      <div class="glass-card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+      <div class="glass-card" style="padding: 14px; display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
         <div class="section-subtitle" style="display: flex; justify-content: space-between; align-items: center;">
           <span><i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> Swap Milestone Tasks</span>
-          <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-teal);">${swapsCount} Total Swaps</span>
+          <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-teal);">${swapsCount} Total Swaps</span>
         </div>
 
         <!-- Task 1: 1,000 Swaps -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; font-size: 0.85rem;">Task 1: Swap 1,000 Times</span>
-            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;">Reward: 2x Mining Boost ⚡</span>
+            <span style="font-weight: 700; font-size: 0.82rem;">Task 1: Swap 1,000 Times</span>
+            <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 700;">2x Mining Boost ⚡</span>
           </div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 1000)} / 1,000 Swaps</div>
-          <button class="wallet-act-btn ${state.tasksClaimed.task1 ? '' : 'primary'}" id="claim-task1-btn" ${state.tasksClaimed.task1 || swapsCount < 1000 ? 'disabled' : ''}>
-            ${state.tasksClaimed.task1 ? '✅ Claimed (2x Speed Unlocked)' : swapsCount >= 1000 ? 'Claim 2x Mining Speed' : 'In Progress'}
-          </button>
+          <div style="font-size: 0.72rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 1000)} / 1,000</div>
+          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+            <div style="width: ${Math.min(swapsCount / 10, 100)}%; height: 100%; background: var(--accent-gold); border-radius: 4px; transition: width 0.3s;"></div>
+          </div>
         </div>
 
         <!-- Task 2: 10,000 Swaps -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; font-size: 0.85rem;">Task 2: Swap 10,000 Times</span>
-            <span style="font-size: 0.75rem; color: var(--accent-teal); font-weight: 700;">Reward: 6 Hours Mining Upgrade ⏳</span>
+            <span style="font-weight: 700; font-size: 0.82rem;">Task 2: Swap 10,000 Times</span>
+            <span style="font-size: 0.72rem; color: var(--accent-teal); font-weight: 700;">6H Mining ⏳</span>
           </div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 10000)} / 10,000 Swaps</div>
-          <button class="wallet-act-btn ${state.tasksClaimed.task2 ? '' : 'primary'}" id="claim-task2-btn" ${state.tasksClaimed.task2 || swapsCount < 10000 ? 'disabled' : ''}>
-            ${state.tasksClaimed.task2 ? '✅ Claimed (6H Mining Unlocked)' : swapsCount >= 10000 ? 'Claim 6H Mining Upgrade' : 'In Progress'}
-          </button>
+          <div style="font-size: 0.72rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 10000)} / 10,000</div>
+          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+            <div style="width: ${Math.min(swapsCount / 100, 100)}%; height: 100%; background: var(--accent-teal); border-radius: 4px; transition: width 0.3s;"></div>
+          </div>
         </div>
 
         <!-- Task 3: 100,000 Swaps -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; font-size: 0.85rem;">Task 3: Swap 100,000 Times</span>
-            <span style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Reward: VIP Member Status 👑</span>
+            <span style="font-weight: 700; font-size: 0.82rem;">Task 3: Swap 100,000 Times</span>
+            <span style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 700;">VIP 👑</span>
           </div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 100000)} / 100,000 Swaps</div>
-          <button class="wallet-act-btn ${state.tasksClaimed.task3 ? '' : 'primary'}" id="claim-task3-btn" ${state.tasksClaimed.task3 || swapsCount < 100000 ? 'disabled' : ''}>
-            ${state.tasksClaimed.task3 ? '✅ VIP Member Active 👑' : swapsCount >= 100000 ? 'Claim VIP Membership' : 'In Progress'}
-          </button>
+          <div style="font-size: 0.72rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 100000)} / 100,000</div>
+          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+            <div style="width: ${Math.min(swapsCount / 1000, 100)}%; height: 100%; background: var(--accent-purple); border-radius: 4px; transition: width 0.3s;"></div>
+          </div>
         </div>
       </div>
     `;
@@ -174,7 +175,7 @@ export function renderSwapScreen(container) {
         const checkInsuff = (fromToken === 'SHOVEL' ? fromAmount + fee : fromAmount) > fromBalance;
         const checkInval = !fromAmount || fromAmount <= 0;
         actionBtn.disabled = checkInsuff || checkInval;
-        actionBtn.innerText = checkInval ? 'Enter Amount' : checkInsuff ? `Insufficient ${fromToken} Balance` : `SWAP ${fromAmount} ${fromToken} ➔ ${toToken}`;
+        actionBtn.textContent = checkInval ? 'Enter Amount' : checkInsuff ? `Insufficient ${fromToken} Balance` : `SWAP ${fromAmount} ${fromToken} ➔ ${toToken}`;
       }
     };
 
@@ -182,7 +183,7 @@ export function renderSwapScreen(container) {
       updateSwapState(e.target.value);
     });
 
-    // Preset Percentage Chips (25%, 50%, 75%, MAX)
+    // Preset Percentage Chips
     container.querySelectorAll('.preset-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         soundEngine.playTabClick();
@@ -204,7 +205,7 @@ export function renderSwapScreen(container) {
       renderUI();
     });
 
-    // Token Selectors Modal using global Modals layer
+    // Token Selectors
     container.querySelector('#from-token-btn')?.addEventListener('click', () => {
       showTokenPickerModal({
         type: 'from',
@@ -227,25 +228,6 @@ export function renderSwapScreen(container) {
           renderUI();
         }
       });
-    });
-
-    // Task Claim Buttons
-    container.querySelector('#claim-task1-btn')?.addEventListener('click', () => {
-      soundEngine.playSwapSuccess();
-      const res = store.claimSwapTask('task1');
-      if (res.success) { showToast(res.rewardMsg); renderUI(); }
-    });
-
-    container.querySelector('#claim-task2-btn')?.addEventListener('click', () => {
-      soundEngine.playSwapSuccess();
-      const res = store.claimSwapTask('task2');
-      if (res.success) { showToast(res.rewardMsg); renderUI(); }
-    });
-
-    container.querySelector('#claim-task3-btn')?.addEventListener('click', () => {
-      soundEngine.playSwapSuccess();
-      const res = store.claimSwapTask('task3');
-      if (res.success) { showToast(res.rewardMsg); renderUI(); }
     });
 
     // Execute Swap Trigger

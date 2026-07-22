@@ -1,5 +1,8 @@
 /* ==========================================================================
-   NAVIGATION COMPONENT (Bottom Telegram Cyberpunk Nav Bar)
+   NAVIGATION COMPONENT (Bottom Telegram Nav Bar)
+   
+   FIX: Replace PRO-only FontAwesome icons with FREE alternatives.
+   fa-pickaxe → fa-hammer (FREE)
    ========================================================================== */
 
 import { store } from '../state.js';
@@ -11,15 +14,15 @@ export function renderNavigation(container) {
 
   container.innerHTML = `
     <div class="nav-item ${current === 'mining' ? 'active' : ''}" data-tab="mining">
-      <i class="fa-solid fa-pickaxe nav-icon"></i>
+      <i class="fa-solid fa-hammer nav-icon"></i>
       <span class="nav-label">Mining</span>
     </div>
     <div class="nav-item ${current === 'swap' ? 'active dex-active' : ''}" data-tab="swap">
-      <i class="fa-solid fa-rotate nav-icon"></i>
+      <i class="fa-solid fa-repeat nav-icon"></i>
       <span class="nav-label">Swap DEX</span>
     </div>
     <div class="nav-item ${current === 'referrals' ? 'active' : ''}" data-tab="referrals">
-      <i class="fa-solid fa-users nav-icon"></i>
+      <i class="fa-solid fa-user-group nav-icon"></i>
       <span class="nav-label">Referrals</span>
     </div>
     <div class="nav-item ${current === 'portfolio' ? 'active' : ''}" data-tab="portfolio">
