@@ -221,7 +221,7 @@ export function applyBgThemeToDOM(themeId) {
   if (themeId === 'theme_bg2') bgImg = '/bg_2.jpg';
   if (themeId === 'theme_bg3') bgImg = '/bg_3.jpg';
 
-  tgApp.style.backgroundImage = `linear-gradient(rgba(10, 11, 14, 0.75), rgba(10, 11, 14, 0.85)), url('${bgImg}')`;
+  tgApp.style.backgroundImage = `linear-gradient(rgba(8, 10, 15, 0.92), rgba(8, 10, 15, 0.97)), url('${bgImg}')`;
   tgApp.style.backgroundSize = 'cover';
   tgApp.style.backgroundPosition = 'center';
 }

@@ -38,7 +38,7 @@ export function renderPortfolioScreen(container) {
 
   container.innerHTML = `
     <div class="screen-header-title">
-      <i class="fa-solid fa-wallet" style="color: var(--accent-teal);"></i> Shovel Wallet Portfolio
+      <i class="fa-solid fa-wallet" style="color: var(--accent-teal);"></i> Portfolio & Assets
     </div>
 
     <!-- Main Total Estimated Balance Card -->
@@ -50,12 +50,12 @@ export function renderPortfolioScreen(container) {
       <div class="portfolio-actions-row">
         <button class="wallet-act-btn primary" id="deposit-faucet-btn" ${isFaucetCooldown ? 'disabled style="background: #334155; color: #94a3b8; box-shadow: none;"' : ''}>
           <i class="fa-solid fa-download"></i> 
-          ${isFaucetCooldown ? `Claimed (${remHours}h ${remMins}m)` : 'Faucet (Watch Ad)'}
+          ${isFaucetCooldown ? `Cooldown (${remHours}h ${remMins}m)` : 'Faucet'}
         </button>
         
         <button class="wallet-act-btn" id="connect-ton-wallet-btn" style="background: ${isWalletConnected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0, 136, 204, 0.2)'}; border-color: ${isWalletConnected ? 'var(--accent-green)' : '#0088cc'}; color: ${isWalletConnected ? 'var(--accent-green)' : '#0088cc'}; font-weight: 800;">
           <i class="${isWalletConnected ? 'fa-solid fa-circle-check' : 'fa-solid fa-link'}"></i> 
-          ${isWalletConnected ? `${walletName}: ${walletAddr.slice(0, 4)}...${walletAddr.slice(-4)}` : 'Connect TON Wallet'}
+          ${isWalletConnected ? `${walletName}: ${walletAddr.slice(0, 4)}...` : 'Connect TON'}
         </button>
       </div>
     </div>

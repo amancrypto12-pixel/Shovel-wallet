@@ -4,8 +4,8 @@
 
 :root {
   --bg-deep: #0a0b0e;
-  --bg-card: rgba(18, 20, 28, 0.88);
-  --bg-card-hover: rgba(28, 32, 45, 0.95);
+  --bg-card: rgba(16, 18, 26, 0.95);
+  --bg-card-hover: rgba(28, 32, 45, 0.98);
   --bg-input: #12151e;
   --border-glass: rgba(255, 255, 255, 0.08);
   --border-neon-gold: rgba(255, 215, 0, 0.4);
@@ -88,7 +88,7 @@ html, body {
   height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
-  background: linear-gradient(rgba(10, 11, 14, 0.8), rgba(10, 11, 14, 0.9)), url('/bg_4.jpg');
+  background: linear-gradient(rgba(8, 10, 15, 0.92), rgba(8, 10, 15, 0.97)), url('/bg_4.jpg');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -105,11 +105,14 @@ html, body {
     background: #000;
   }
   .tg-app {
-    position: relative;
-    height: 96vh;
-    border-radius: 28px;
-    border: 1px solid var(--border-glass);
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
 }
 
@@ -1056,18 +1059,22 @@ html, body {
 
 .wallet-act-btn {
   flex: 1;
-  padding: 9px;
+  min-width: 0;
+  padding: 9px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.76rem;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   transition: all 0.2s ease;
 }
 
