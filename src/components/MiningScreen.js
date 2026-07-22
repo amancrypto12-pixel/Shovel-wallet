@@ -19,51 +19,51 @@ export function renderMiningScreen(container, particleEngine) {
     <!-- Top Mining Token Banner -->
     <div class="mine-banner-summary">
       <div class="mine-token-badge">
-        <img src="/shovel_logo.png" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;" />
+        <img src="/shovel_logo.png" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;" />
         <span>$SHOVEL MINING</span>
       </div>
       <div class="huge-balance" id="main-mine-balance">${state.balances.SHOVEL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
       <div class="mine-subtitle">Real-time Multi-Crypto Mining Hub</div>
     </div>
 
-    <!-- Central Mining Button & Outer Rings -->
+    <!-- Central Mining Device Ring & Tap Button -->
     <div class="mining-hero-container">
       <div class="mining-outer-ring"></div>
       <div class="mining-outer-glow"></div>
 
-      <!-- Circular SVG Cooldown Progress Ring -->
-      <svg class="cooldown-svg" viewBox="0 0 200 200">
-        <circle class="cooldown-circle-bg" cx="100" cy="100" r="90" fill="none" />
-        <circle class="cooldown-circle-progress" id="session-progress-ring" cx="100" cy="100" r="90" fill="none" 
+      <!-- Circular SVG Cooldown Progress Ring (r=72, circumference=450) -->
+      <svg class="cooldown-svg" viewBox="0 0 165 165">
+        <circle class="cooldown-circle-bg" cx="82.5" cy="82.5" r="72" fill="none" />
+        <circle class="cooldown-circle-progress" id="session-progress-ring" cx="82.5" cy="82.5" r="72" fill="none" 
           stroke="${isMiningActive ? 'var(--accent-teal)' : 'var(--accent-gold)'}" />
       </svg>
 
       <!-- Main Action Clickable Mining Button -->
       <button class="mining-tap-btn ${isMiningActive ? 'mining-active-state' : ''}" id="main-mining-action-btn">
-        <div id="mining-center-content">
+        <div id="mining-center-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
           ${isMiningActive ? `
-            <div class="cooldown-timer-text" id="mining-timer-display">00:00:00</div>
-            <div style="font-size: 0.65rem; color: var(--accent-teal); font-weight: 700; margin-top: 4px;">MINING IN PROGRESS</div>
+            <div class="cooldown-timer-text" id="mining-timer-display">02:59:59</div>
+            <div style="font-size: 0.6rem; color: var(--accent-teal); font-weight: 700; margin-top: 2px;">MINING IN PROGRESS</div>
           ` : `
-            <div style="font-size: 1.8rem; color: var(--accent-gold);"><i class="fa-solid fa-play"></i></div>
+            <div style="font-size: 1.5rem; color: var(--accent-gold);"><i class="fa-solid fa-play"></i></div>
             <div class="mine-btn-label">START MINING</div>
-            <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px;">(Watch Ad ➔ 3H Session)</div>
+            <div style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 1px;">(Watch Ad ➔ 3H)</div>
           `}
         </div>
       </button>
     </div>
 
     <!-- Live Yield Counter Card -->
-    <div class="glass-card" style="width: 100%; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+    <div class="glass-card" style="width: 100%; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
       <div style="text-align: left;">
-        <div style="font-size: 0.75rem; color: var(--text-secondary);">Session Yield Accumulating</div>
-        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 1.1rem; color: var(--accent-teal);" id="live-yield-counter">
+        <div style="font-size: 0.72rem; color: var(--text-secondary);">Session Yield Accumulating</div>
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 1rem; color: var(--accent-teal);" id="live-yield-counter">
           ${calculateCurrentYield(state)} SHOVEL
         </div>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 0.75rem; color: var(--text-secondary);">Mining Rate</div>
-        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.95rem; color: var(--accent-gold);">
+        <div style="font-size: 0.72rem; color: var(--text-secondary);">Mining Rate</div>
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.9rem; color: var(--accent-gold);">
           ${(state.autoMining.ratePerHour * (state.autoMining.boostEnd > Date.now() ? 2.0 : 1.0) * (state.user.isVip ? 3.0 : 1.0)).toFixed(1)} SHOVEL/HR
         </div>
       </div>
@@ -141,7 +141,7 @@ export function renderMiningScreen(container, particleEngine) {
     });
   });
 
-  // Smooth Tick Update Function (Updates UI without re-creating DOM elements)
+  // Targeted Update Tick for Timer & Live Yield
   function updateTick() {
     const s = store.getState();
     const now = Date.now();
@@ -167,8 +167,8 @@ export function renderMiningScreen(container, particleEngine) {
       const elapsedMs = Math.min(totalMs, now - s.autoMining.startTime);
       const progressRatio = elapsedMs / totalMs;
 
-      // Update SVG ring offset (circumference = 565)
-      if (ring) ring.style.strokeDashoffset = (565 * (1 - progressRatio)).toFixed(2);
+      // Update SVG ring offset (circumference = 450)
+      if (ring) ring.style.strokeDashoffset = (450 * (1 - progressRatio)).toFixed(2);
 
       const hours = String(Math.floor(remMs / 3600000)).padStart(2, '0');
       const mins = String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0');
@@ -179,17 +179,17 @@ export function renderMiningScreen(container, particleEngine) {
       } else if (centerContent) {
         centerContent.innerHTML = `
           <div class="cooldown-timer-text" id="mining-timer-display">${hours}:${mins}:${secs}</div>
-          <div style="font-size: 0.65rem; color: var(--accent-teal); font-weight: 700; margin-top: 4px;">MINING IN PROGRESS</div>
+          <div style="font-size: 0.6rem; color: var(--accent-teal); font-weight: 700; margin-top: 2px;">MINING IN PROGRESS</div>
         `;
       }
     } else {
       btn?.classList.remove('mining-active-state');
-      if (ring) ring.style.strokeDashoffset = '565';
+      if (ring) ring.style.strokeDashoffset = '450';
       if (centerContent && !container.querySelector('.mine-btn-label')) {
         centerContent.innerHTML = `
-          <div style="font-size: 1.8rem; color: var(--accent-gold);"><i class="fa-solid fa-play"></i></div>
+          <div style="font-size: 1.5rem; color: var(--accent-gold);"><i class="fa-solid fa-play"></i></div>
           <div class="mine-btn-label">START MINING</div>
-          <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px;">(Watch Ad ➔ 3H Session)</div>
+          <div style="font-size: 0.6rem; color: var(--text-secondary); margin-top: 1px;">(Watch Ad ➔ 3H)</div>
         `;
       }
     }
@@ -198,6 +198,7 @@ export function renderMiningScreen(container, particleEngine) {
   // Clear previous timer and run targeted updates
   if (miningTimerInterval) clearInterval(miningTimerInterval);
   miningTimerInterval = setInterval(updateTick, 1000);
+  updateTick(); // Initial tick run
 }
 
 function calculateCurrentYield(s) {
