@@ -286,8 +286,36 @@ export function showWelcomeModal() {
   });
 }
 
-// --- 2. Rewarded Video Ad Modal Simulator ---
+const ADSGRAM_BLOCK_ID = '59129';
+
+// --- 2. Real Adsgram Rewarded Video Ad Integration ---
 export function showRewardedAdModal(onAdComplete) {
+  // Check if real Adsgram SDK is available in Telegram WebApp
+  if (window.Adsgram) {
+    showToast('📺 Loading Real Adsgram Video Ad...');
+    try {
+      const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+      AdController.show().then((result) => {
+        // User watched 100% of the video ad
+        soundEngine.playEnergyBoost();
+        showToast('✅ Ad Verified! Reward Granted!');
+        if (typeof onAdComplete === 'function') {
+          onAdComplete();
+        } else {
+          store.applyAdBoost();
+          showToast('⚡ 2x Speed Boost Activated for 1 Hour!');
+        }
+      }).catch((error) => {
+        console.warn('Adsgram Ad Error or Skipped:', error);
+        showToast('⚠️ Ad skipped or closed early: Full view required for reward');
+      });
+      return;
+    } catch (e) {
+      console.warn('Adsgram init exception:', e);
+    }
+  }
+
+  // Fallback simulator if testing locally or outside Telegram
   const container = getModalContainer();
   if (!container) return;
 
@@ -296,9 +324,9 @@ export function showRewardedAdModal(onAdComplete) {
   container.innerHTML = `
     <div class="glass-card modal-card" style="border-color: var(--accent-purple);">
       <div class="modal-icon-hero" style="color: var(--accent-purple);"><i class="fa-solid fa-play"></i></div>
-      <div class="modal-title">Shovel Video Ad Simulator</div>
+      <div class="modal-title">Adsgram Ad Simulator</div>
       <div class="modal-text">
-        Watching Partner Video Ad...
+        Watching Adsgram Video Ad (Block ID: 59129)...
         <br><br>
         <div id="ad-countdown" style="font-family: 'Rubik', sans-serif; font-size: 2rem; font-weight: 900; color: var(--accent-purple);">
           00:0${seconds}
@@ -325,7 +353,7 @@ export function showRewardedAdModal(onAdComplete) {
         btn.disabled = false;
         btn.style.background = 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)';
         btn.style.color = 'white';
-        btn.innerText = '⚡ Ad Verified! Proceed';
+        btn.innerText = '⚡ Ad Verified! Claim Reward';
       }
     }
   }, 1000);
