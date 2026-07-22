@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TELEGRAM MINING & TESTNET DEX MINI APP — CYBER MOLTEN MAGMA THEME 4
+   TELEGRAM MINING & TESTNET DEX MINI APP — MOBILE-FIRST CYBER NEON STYLES
    ========================================================================== */
 
 :root {
@@ -40,30 +40,28 @@
   --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
-/* Base Reset & Performance Optimization */
-* {
+/* Base Reset & Mobile Viewport Lock */
+html, body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-main);
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-body {
-  background-color: var(--bg-deep);
-  color: var(--text-primary);
-  font-family: var(--font-main);
-  overflow: hidden;
-  height: 100vh;
-  height: 100dvh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-
-/* Background Canvas */
+/* Background Canvas Layer */
 #bg-canvas, #particle-canvas {
   position: fixed;
   top: 0;
@@ -78,31 +76,36 @@ body {
   z-index: 999;
 }
 
-/* App Container (Telegram Viewport) */
+/* Telegram Viewport Container - Mobile Responsive Flex Column */
 .tg-app {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 480px;
   height: 100%;
-  max-height: 100%;
+  height: 100dvh;
+  margin: 0 auto;
   background: linear-gradient(rgba(10, 11, 14, 0.75), rgba(10, 11, 14, 0.85)), url('/bg_4.jpg');
   background-size: cover;
   background-position: center;
-  border: 1px solid var(--border-glass);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   z-index: 1;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 481px) {
   body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 12px 0;
+    position: relative;
   }
   .tg-app {
     height: 96vh;
     border-radius: 28px;
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
   }
 }
 
@@ -126,7 +129,7 @@ body {
    HEADER SECTION
    ========================================================================== */
 .app-header {
-  height: 58px;
+  height: 56px;
   flex-shrink: 0;
   padding: 0 16px;
   display: flex;
@@ -135,7 +138,7 @@ body {
   border-bottom: 1px solid var(--border-glass);
   background: rgba(10, 11, 14, 0.95);
   backdrop-filter: blur(12px);
-  z-index: 10;
+  z-index: 50;
 }
 
 .user-profile {
@@ -223,21 +226,23 @@ body {
 }
 
 /* ==========================================================================
-   VIEWPORT ROUTER (OPTIMIZED SMOOTH SCROLLING)
+   VIEWPORT ROUTER (MOBILE SCROLL CONTAINMENT WITH ZERO CUT-OFF)
    ========================================================================== */
 .app-viewport {
   flex: 1 1 0%;
   height: 0;
+  min-height: 0;
+  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 14px 16px 40px 16px;
+  padding: 12px 14px 30px 14px;
   position: relative;
   scroll-behavior: smooth;
 }
 
 .app-viewport::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 .app-viewport::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.2);
@@ -246,15 +251,12 @@ body {
   background: rgba(255, 215, 0, 0.3);
   border-radius: 6px;
 }
-.app-viewport::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 215, 0, 0.6);
-}
 
 .screen {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 20px;
+  padding-bottom: 24px;
   opacity: 0;
   transform: translateY(10px);
   animation: screen-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -319,8 +321,8 @@ body {
 /* Central Mining Device Ring & Tap Button */
 .mining-hero-container {
   position: relative;
-  width: 210px;
-  height: 210px;
+  width: 200px;
+  height: 200px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -349,8 +351,8 @@ body {
 
 .mining-tap-btn {
   position: relative;
-  width: 165px;
-  height: 165px;
+  width: 155px;
+  height: 155px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #2a2512 0%, #121008 60%, #050402 100%);
   border: 4px solid var(--accent-gold);
@@ -1182,28 +1184,31 @@ body {
 }
 
 /* ==========================================================================
-   BOTTOM NAVIGATION BAR (PERMANENTLY ATTACHED FLEX-SHRINK: 0 AT BOTTOM)
+   BOTTOM NAVIGATION BAR (PERMANENTLY FIXED AT BOTTOM WITH SAFE-AREA SUPPORT)
    ========================================================================== */
 .app-nav {
-  height: 64px;
+  height: calc(60px + env(safe-area-inset-bottom, 0px));
   flex-shrink: 0;
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom, 4px);
   background: #0a0b0e;
   border-top: 1px solid var(--border-glass);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 10;
+  z-index: 100;
+  position: relative;
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 6px;
+  padding: 4px;
   width: 25%;
 }
 
@@ -1213,7 +1218,7 @@ body {
 }
 
 .nav-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
 }
 
@@ -1234,14 +1239,14 @@ body {
    MODAL OVERLAY & POPUPS
    ========================================================================== */
 .modal-container {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
-  z-index: 100;
+  z-index: 200;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1301,11 +1306,11 @@ body {
 
 /* Toast Notifications */
 .toast-container {
-  position: absolute;
+  position: fixed;
   top: 70px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 200;
+  z-index: 300;
   display: flex;
   flex-direction: column;
   gap: 8px;
