@@ -46,7 +46,6 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -85,7 +84,6 @@ html, body {
   bottom: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
   background: linear-gradient(rgba(8, 10, 15, 0.92), rgba(8, 10, 15, 0.97)), url('/bg_4.jpg');
@@ -95,25 +93,6 @@ html, body {
   flex-direction: column;
   overflow: hidden;
   z-index: 1;
-}
-
-@media (min-width: 481px) {
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #000;
-  }
-  .tg-app {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 100%;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-  }
 }
 
 /* Global Glass Card Utility */
@@ -239,7 +218,7 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 12px 14px 28px 14px;
+  padding: 12px 14px 80px 14px;
   position: relative;
 }
 
@@ -1149,21 +1128,25 @@ html, body {
 }
 
 /* ==========================================================================
-   BOTTOM NAVIGATION BAR (PERMANENTLY ATTACHED FLEX-SHRINK: 0 AT BOTTOM)
+   BOTTOM NAVIGATION BAR — POSITION FIXED AT BOTTOM (ALWAYS VISIBLE)
    ========================================================================== */
 .app-nav {
-  height: auto;
-  min-height: 56px;
-  flex-shrink: 0;
-  width: 100%;
-  background: #0a0b0e;
-  border-top: 1px solid var(--border-glass);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  height: 58px;
+  background: rgba(10, 11, 14, 0.98);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 100;
-  position: relative;
+  z-index: 150;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .nav-item {
