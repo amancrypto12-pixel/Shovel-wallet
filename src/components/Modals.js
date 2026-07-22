@@ -30,6 +30,8 @@ export function showToast(msg) {
   }, 2500);
 }
 
+import { openRealTonConnectModal, disconnectRealTonWallet } from '../tonConnect.js';
+
 // --- 0. TON Connect 2.0 Web3 Wallet Connection Modal ---
 export function showTonConnectModal() {
   const container = getModalContainer();
@@ -39,26 +41,30 @@ export function showTonConnectModal() {
   const wallets = [
     { 
       name: 'Tonkeeper', 
+      appName: 'tonkeeper',
       color: '#45AEF5',
-      desc: 'Most Popular TON Wallet',
+      desc: 'Opens Tonkeeper App Directly',
       svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#45AEF5"/><path d="M28 14L14 24v12l14 8 14-8V24L28 14zm0 4.5l9.5 6.5v8.5L28 40l-9.5-6.5V25L28 18.5z" fill="#fff"/><path d="M28 26v14" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`
     },
     { 
       name: 'Telegram Wallet', 
+      appName: 'telegram-wallet',
       color: '#229ED9',
-      desc: '@wallet Bot inside Telegram',
+      desc: 'Opens @wallet inside Telegram',
       svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#229ED9"/><path d="M18 28.5l5.3 2 2 6.5 3-3.5 5.2 4L39 19 18 28.5z" fill="#fff"/><path d="M23.3 30.5l-.3 5 3-3.5" fill="#B0D4F1"/><path d="M23.3 30.5L33 24l-7.7 7.5" fill="#D2E5F9"/></svg>`
     },
     { 
       name: 'MyTonWallet', 
+      appName: 'mytonwallet',
       color: '#2F6BED',
-      desc: 'Web & Extension Wallet',
+      desc: 'Opens MyTonWallet App',
       svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#2F6BED"/><path d="M22 20h12c1.7 0 2.7 1.8 1.8 3.2L29 33.6c-.8 1.4-2.8 1.4-3.6 0L18.2 23.2C17.3 21.8 18.3 20 22 20z" fill="none" stroke="#fff" stroke-width="3"/><path d="M28 20v14" stroke="#fff" stroke-width="3"/></svg>`
     },
     { 
       name: 'TonHub', 
+      appName: 'tonhub',
       color: '#1C8CF0',
-      desc: 'Secure Mobile Wallet',
+      desc: 'Opens TonHub Mobile App',
       svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#1C8CF0"/><circle cx="28" cy="28" r="12" fill="none" stroke="#fff" stroke-width="3"/><path d="M28 20v16M22 28h12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>`
     }
   ];
@@ -73,13 +79,13 @@ export function showTonConnectModal() {
         </svg>
         <div>
           <div class="modal-title" style="font-size: 1.1rem; text-align: left;">Connect TON Wallet</div>
-          <div style="font-size: 0.7rem; color: var(--text-secondary); text-align: left;">Select wallet to connect</div>
+          <div style="font-size: 0.7rem; color: var(--text-secondary); text-align: left;">Select wallet to open app directly</div>
         </div>
       </div>
 
       <div style="width: 100%; display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
         ${wallets.map(w => `
-          <div class="glass-card wallet-option-item" data-wallet="${w.name}"
+          <div class="glass-card wallet-option-item" data-wallet="${w.name}" data-app="${w.appName}"
             style="padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-color: rgba(255,255,255,0.08);">
             <div style="display: flex; align-items: center; gap: 10px;">
               ${w.svg}
@@ -88,12 +94,16 @@ export function showTonConnectModal() {
                 <div style="font-size: 0.68rem; color: var(--text-secondary);">${w.desc}</div>
               </div>
             </div>
-            <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; color: var(--text-secondary);"></i>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem; color: #0088cc;"></i>
           </div>
         `).join('')}
       </div>
 
-      <button style="background: transparent; border: none; color: var(--text-secondary); margin-top: 8px; font-size: 0.82rem; cursor: pointer;" id="close-ton-connect-btn">
+      <button style="width: 100%; padding: 10px; margin-top: 8px; border-radius: 10px; background: linear-gradient(135deg, #0088cc 0%, #0055aa 100%); border: none; color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer;" id="open-official-tonconnect-btn">
+        <i class="fa-solid fa-wallet"></i> Open TON Connect Picker
+      </button>
+
+      <button style="background: transparent; border: none; color: var(--text-secondary); margin-top: 6px; font-size: 0.8rem; cursor: pointer;" id="close-ton-connect-btn">
         Cancel
       </button>
     </div>
@@ -103,30 +113,21 @@ export function showTonConnectModal() {
 
   container.querySelector('#close-ton-connect-btn')?.addEventListener('click', hideModal);
 
+  // Trigger real TonConnect UI Modal
+  const triggerRealConnect = () => {
+    hideModal();
+    openRealTonConnectModal();
+  };
+
+  container.querySelector('#open-official-tonconnect-btn')?.addEventListener('click', () => {
+    soundEngine.playTabClick();
+    triggerRealConnect();
+  });
+
   container.querySelectorAll('.wallet-option-item').forEach(item => {
     item.addEventListener('click', () => {
       soundEngine.playTabClick();
-      const walletName = item.dataset.wallet;
-      
-      const card = item;
-      card.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;">
-          <i class="fa-solid fa-spinner fa-spin" style="color: #0088cc; font-size: 1.2rem;"></i>
-          <span style="font-weight: 700; font-size: 0.82rem; color: white;">Connecting ${walletName}...</span>
-        </div>
-      `;
-
-      setTimeout(() => {
-        // Generate realistic mock TON address
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let addr = 'EQ';
-        for (let i = 0; i < 46; i++) addr += chars[Math.floor(Math.random() * chars.length)];
-        
-        store.connectTonWallet(walletName, addr);
-        soundEngine.playSwapSuccess();
-        hideModal();
-        showToast(`💎 Connected to ${walletName}! (${addr.slice(0, 6)}...${addr.slice(-4)})`);
-      }, 1500);
+      triggerRealConnect();
     });
   });
 }
@@ -152,7 +153,7 @@ export function showTonWalletDetailsModal() {
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
           <span style="color: var(--text-secondary);">Address:</span>
-          <code style="color: var(--accent-teal); font-size: 0.75rem;">${tw.address || 'EQBvW89x...7F9k'}</code>
+          <code style="color: var(--accent-teal); font-size: 0.75rem;">${tw.address ? tw.address.slice(0,6) + '...' + tw.address.slice(-6) : 'Connected'}</code>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
           <span style="color: var(--text-secondary);">Network:</span>
@@ -172,9 +173,9 @@ export function showTonWalletDetailsModal() {
   container.classList.remove('hidden');
 
   container.querySelector('#close-wallet-details-btn')?.addEventListener('click', hideModal);
-  container.querySelector('#disconnect-wallet-btn')?.addEventListener('click', () => {
+  container.querySelector('#disconnect-wallet-btn')?.addEventListener('click', async () => {
     soundEngine.playCoinTap();
-    store.disconnectTonWallet();
+    await disconnectRealTonWallet();
     hideModal();
     showToast('🔴 TON Wallet Disconnected!');
   });

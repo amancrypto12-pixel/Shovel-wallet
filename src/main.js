@@ -16,6 +16,7 @@ import { renderSwapScreen } from './components/SwapScreen.js';
 import { renderReferralScreen } from './components/ReferralScreen.js';
 import { renderPortfolioScreen } from './components/PortfolioScreen.js';
 import { showWelcomeModal, applyBgThemeToDOM } from './components/Modals.js';
+import { initTonConnect } from './tonConnect.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize HTML5 Canvas Background Particle Physics Engine
@@ -23,8 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const particleCanvas = document.getElementById('particle-canvas');
   const particleEngine = new ParticleEngine(bgCanvas, particleCanvas);
 
-  // 2. Initialize Telegram WebApp SDK
+  // 2. Initialize Telegram WebApp SDK & Real TonConnect SDK
   initTelegramWebApp();
+  initTonConnect();
 
   // 3. Cache Core Shell DOM Elements
   const headerContainer = document.getElementById('app-header');
