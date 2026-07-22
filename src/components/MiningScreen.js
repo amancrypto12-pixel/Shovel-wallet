@@ -57,17 +57,17 @@ export function renderMiningScreen(container, particleEngine) {
     </div>
 
     <!-- Live Yield Counter Card -->
-    <div class="glass-card" style="width: 100%; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
-      <div style="text-align: left;">
-        <div style="font-size: 0.72rem; color: var(--text-secondary);">Session Yield</div>
-        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 1rem; color: var(--accent-teal);" id="live-yield-counter">
+    <div class="glass-card" style="width: 100%; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; overflow: hidden;">
+      <div style="text-align: left; min-width: 0; flex: 1;">
+        <div style="font-size: 0.7rem; color: var(--text-secondary);">Session Yield</div>
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.92rem; color: var(--accent-teal); white-space: nowrap;" id="live-yield-counter">
           ${calculateCurrentYield(state)} SHOVEL
         </div>
       </div>
-      <div style="text-align: right;">
-        <div style="font-size: 0.72rem; color: var(--text-secondary);">Mining Rate</div>
-        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.9rem; color: var(--accent-gold);">
-          ${getEffectiveRate(state).toFixed(1)} SHOVEL/HR
+      <div style="text-align: right; flex-shrink: 0;">
+        <div style="font-size: 0.7rem; color: var(--text-secondary);">Rate</div>
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.85rem; color: var(--accent-gold); white-space: nowrap;">
+          ${getEffectiveRate(state).toFixed(1)} /HR
         </div>
       </div>
     </div>

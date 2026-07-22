@@ -35,42 +35,65 @@ export function showTonConnectModal() {
   const container = getModalContainer();
   if (!container) return;
 
+  // Real TON ecosystem wallet options with inline SVG icons
   const wallets = [
-    { name: 'Tonkeeper', icon: '💎', color: '#0088cc', desc: 'Popular TON Mobile Wallet' },
-    { name: 'Telegram Wallet', icon: '👛', color: '#229ed9', desc: '@wallet inside Telegram' },
-    { name: 'MyTonWallet', icon: '⚡', color: '#3396ff', desc: 'Fast Web & Extension Wallet' },
-    { name: 'OpenMask', icon: '🦊', color: '#f59e0b', desc: 'Biometric Web3 Browser Extension' }
+    { 
+      name: 'Tonkeeper', 
+      color: '#45AEF5',
+      desc: 'Most Popular TON Wallet',
+      svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#45AEF5"/><path d="M28 14L14 24v12l14 8 14-8V24L28 14zm0 4.5l9.5 6.5v8.5L28 40l-9.5-6.5V25L28 18.5z" fill="#fff"/><path d="M28 26v14" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`
+    },
+    { 
+      name: 'Telegram Wallet', 
+      color: '#229ED9',
+      desc: '@wallet Bot inside Telegram',
+      svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#229ED9"/><path d="M18 28.5l5.3 2 2 6.5 3-3.5 5.2 4L39 19 18 28.5z" fill="#fff"/><path d="M23.3 30.5l-.3 5 3-3.5" fill="#B0D4F1"/><path d="M23.3 30.5L33 24l-7.7 7.5" fill="#D2E5F9"/></svg>`
+    },
+    { 
+      name: 'MyTonWallet', 
+      color: '#2F6BED',
+      desc: 'Web & Extension Wallet',
+      svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#2F6BED"/><path d="M22 20h12c1.7 0 2.7 1.8 1.8 3.2L29 33.6c-.8 1.4-2.8 1.4-3.6 0L18.2 23.2C17.3 21.8 18.3 20 22 20z" fill="none" stroke="#fff" stroke-width="3"/><path d="M28 20v14" stroke="#fff" stroke-width="3"/></svg>`
+    },
+    { 
+      name: 'TonHub', 
+      color: '#1C8CF0',
+      desc: 'Secure Mobile Wallet',
+      svg: `<svg viewBox="0 0 56 56" style="width:36px;height:36px;border-radius:10px;"><rect width="56" height="56" rx="12" fill="#1C8CF0"/><circle cx="28" cy="28" r="12" fill="none" stroke="#fff" stroke-width="3"/><path d="M28 20v16M22 28h12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>`
+    }
   ];
 
   container.innerHTML = `
-    <div class="glass-card modal-card" style="max-width: 360px;">
-      <div class="modal-icon-hero" style="color: #0088cc;">
-        <i class="fa-solid fa-wallet"></i>
-      </div>
-      <div class="modal-title" style="font-size: 1.2rem;">
-        Connect TON Wallet
-      </div>
-      <div class="modal-text" style="font-size: 0.8rem; margin-bottom: 6px;">
-        Choose your preferred TON wallet to connect with Shovel Wallet:
+    <div class="glass-card modal-card" style="max-width: 340px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+        <svg viewBox="0 0 128 128" style="width: 32px; height: 32px;">
+          <circle cx="64" cy="64" r="64" fill="#0088CC"/>
+          <path d="M41 40h46c2.8 0 4.5 3 3.1 5.3L67.1 84.7c-1.4 2.3-4.8 2.3-6.2 0L37.9 45.3C36.5 43 38.2 40 41 40z" fill="none" stroke="#FFF" stroke-width="7"/>
+          <path d="M64 40v46" stroke="#FFF" stroke-width="7"/>
+        </svg>
+        <div>
+          <div class="modal-title" style="font-size: 1.1rem; text-align: left;">Connect TON Wallet</div>
+          <div style="font-size: 0.7rem; color: var(--text-secondary); text-align: left;">Select wallet to connect</div>
+        </div>
       </div>
 
-      <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
         ${wallets.map(w => `
           <div class="glass-card wallet-option-item" data-wallet="${w.name}"
-            style="padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-color: rgba(255,255,255,0.08);">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="font-size: 1.4rem;">${w.icon}</span>
+            style="padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-color: rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              ${w.svg}
               <div style="text-align: left;">
-                <div style="font-weight: 700; font-size: 0.9rem; color: white;">${w.name}</div>
-                <div style="font-size: 0.72rem; color: var(--text-secondary);">${w.desc}</div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: white;">${w.name}</div>
+                <div style="font-size: 0.68rem; color: var(--text-secondary);">${w.desc}</div>
               </div>
             </div>
-            <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-secondary);"></i>
+            <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; color: var(--text-secondary);"></i>
           </div>
         `).join('')}
       </div>
 
-      <button style="background: transparent; border: none; color: var(--text-secondary); margin-top: 10px; font-size: 0.85rem; cursor: pointer;" id="close-ton-connect-btn">
+      <button style="background: transparent; border: none; color: var(--text-secondary); margin-top: 8px; font-size: 0.82rem; cursor: pointer;" id="close-ton-connect-btn">
         Cancel
       </button>
     </div>
@@ -89,17 +112,21 @@ export function showTonConnectModal() {
       card.innerHTML = `
         <div style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;">
           <i class="fa-solid fa-spinner fa-spin" style="color: #0088cc; font-size: 1.2rem;"></i>
-          <span style="font-weight: 700; font-size: 0.85rem; color: white;">Connecting to ${walletName}...</span>
+          <span style="font-weight: 700; font-size: 0.82rem; color: white;">Connecting ${walletName}...</span>
         </div>
       `;
 
       setTimeout(() => {
-        const mockAddress = `EQBvW89x_${walletName}_7F9k`;
-        store.connectTonWallet(walletName, mockAddress);
+        // Generate realistic mock TON address
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let addr = 'EQ';
+        for (let i = 0; i < 46; i++) addr += chars[Math.floor(Math.random() * chars.length)];
+        
+        store.connectTonWallet(walletName, addr);
         soundEngine.playSwapSuccess();
         hideModal();
-        showToast(`💎 Connected to ${walletName}! (${mockAddress.slice(0, 6)}...${mockAddress.slice(-4)})`);
-      }, 1200);
+        showToast(`💎 Connected to ${walletName}! (${addr.slice(0, 6)}...${addr.slice(-4)})`);
+      }, 1500);
     });
   });
 }
@@ -213,17 +240,8 @@ export function showThemePickerModal() {
 }
 
 export function applyBgThemeToDOM(themeId) {
-  const tgApp = document.querySelector('.tg-app');
-  if (!tgApp) return;
-
-  let bgImg = '/bg_4.jpg';
-  if (themeId === 'theme_bg1') bgImg = '/bg_1.jpg';
-  if (themeId === 'theme_bg2') bgImg = '/bg_2.jpg';
-  if (themeId === 'theme_bg3') bgImg = '/bg_3.jpg';
-
-  tgApp.style.backgroundImage = `linear-gradient(rgba(8, 10, 15, 0.92), rgba(8, 10, 15, 0.97)), url('${bgImg}')`;
-  tgApp.style.backgroundSize = 'cover';
-  tgApp.style.backgroundPosition = 'center';
+  // Background themes disabled — solid dark background for clean UI
+  // No background image to prevent visual bleed-through on glass cards
 }
 
 // --- 1. Welcome / Onboarding Modal ---

@@ -40,6 +40,11 @@
   --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
+/* Global Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* Base Reset & Mobile Viewport Lock */
 html, body {
   margin: 0;
@@ -47,17 +52,13 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   background-color: var(--bg-deep);
   color: var(--text-primary);
   font-family: var(--font-main);
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
 
 /* Background Canvas Layer */
@@ -73,6 +74,7 @@ html, body {
 
 #particle-canvas {
   z-index: 999;
+  pointer-events: none;
 }
 
 /* Telegram Viewport Container - Strict Mobile Flex Column Layout */
@@ -86,9 +88,7 @@ html, body {
   height: 100%;
   max-width: 480px;
   margin: 0 auto;
-  background: linear-gradient(rgba(8, 10, 15, 0.92), rgba(8, 10, 15, 0.97)), url('/bg_4.jpg');
-  background-size: cover;
-  background-position: center;
+  background: #080a0f;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -212,35 +212,37 @@ html, body {
    ========================================================================== */
 .app-viewport {
   flex: 1 1 0%;
-  height: 0;
   min-height: 0;
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 12px 14px 80px 14px;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: 10px 12px 80px 12px;
   position: relative;
 }
 
 .app-viewport::-webkit-scrollbar {
-  width: 5px;
+  width: 3px;
 }
 .app-viewport::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: transparent;
 }
 .app-viewport::-webkit-scrollbar-thumb {
-  background: rgba(255, 215, 0, 0.3);
+  background: rgba(255, 215, 0, 0.2);
   border-radius: 6px;
 }
 
 .screen {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-bottom: 24px;
-  opacity: 0;
-  transform: translateY(8px);
-  animation: screen-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  gap: 10px;
+  padding-bottom: 16px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  animation: screen-fade-in 0.2s ease forwards;
 }
 
 @keyframes screen-fade-in {
@@ -546,8 +548,17 @@ html, body {
 .swap-input-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-secondary);
+  overflow: hidden;
+}
+
+.swap-balance-lbl {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+  text-align: right;
 }
 
 .swap-balance-lbl span {
@@ -814,6 +825,9 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .ref-avatar {
@@ -843,8 +857,11 @@ html, body {
 .ref-bonus-val {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--accent-gold);
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-align: right;
 }
 
 /* Leaderboard Tab & Top 3 Podium */
@@ -1114,16 +1131,19 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  flex-shrink: 0;
+  max-width: 50%;
 }
 
 .token-holding-amt {
   font-family: var(--font-mono);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .token-holding-usd {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-secondary);
 }
 

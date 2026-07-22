@@ -109,9 +109,9 @@ export function renderSwapScreen(container) {
       </div>
 
       <!-- Transaction Rate & Fee Banner -->
-      <div class="glass-card" style="padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
-        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--text-primary);">${getRateString()}</span>
-        <span style="color: var(--accent-teal); font-weight: 700;">Fee: 0.1 SHOVEL</span>
+      <div class="glass-card" style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; overflow: hidden; gap: 8px;">
+        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;">${getRateString()}</span>
+        <span style="color: var(--accent-teal); font-weight: 700; white-space: nowrap; flex-shrink: 0;">Fee: 0.1</span>
       </div>
 
       <!-- MAIN SWAP ACTION BUTTON -->
