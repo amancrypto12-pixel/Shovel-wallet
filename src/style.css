@@ -3,29 +3,29 @@
    ========================================================================== */
 
 :root {
-  --bg-deep: #0a0b0e;
-  --bg-card: rgba(16, 18, 26, 0.95);
-  --bg-card-hover: rgba(28, 32, 45, 0.98);
-  --bg-input: #12151e;
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-neon-gold: rgba(255, 215, 0, 0.4);
-  --border-neon-teal: rgba(0, 255, 255, 0.4);
+  --bg-deep: #f0f2f8;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card-hover: rgba(240, 245, 255, 0.98);
+  --bg-input: #e8ecf4;
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --border-neon-gold: rgba(200, 150, 0, 0.4);
+  --border-neon-teal: rgba(0, 160, 200, 0.4);
   
-  --accent-gold: #ffd700;
-  --accent-gold-glow: rgba(255, 215, 0, 0.6);
-  --accent-gold-gradient: linear-gradient(135deg, #ffe57f 0%, #ffd700 50%, #ff8f00 100%);
+  --accent-gold: #d4a000;
+  --accent-gold-glow: rgba(212, 160, 0, 0.4);
+  --accent-gold-gradient: linear-gradient(135deg, #ffe57f 0%, #d4a000 50%, #b07000 100%);
   
-  --accent-teal: #00ffff;
-  --accent-teal-glow: rgba(0, 255, 255, 0.5);
-  --accent-teal-gradient: linear-gradient(135deg, #80d8ff 0%, #00ffff 50%, #0091ea 100%);
+  --accent-teal: #0088cc;
+  --accent-teal-glow: rgba(0, 136, 204, 0.4);
+  --accent-teal-gradient: linear-gradient(135deg, #80cfff 0%, #0088cc 50%, #005a99 100%);
   
-  --accent-purple: #a855f7;
-  --accent-green: #10b981;
-  --accent-red: #ef4444;
+  --accent-purple: #7c3aed;
+  --accent-green: #059669;
+  --accent-red: #dc2626;
 
-  --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
   --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Rubik', sans-serif;
@@ -35,9 +35,9 @@
   --radius-lg: 24px;
   --radius-full: 9999px;
 
-  --shadow-gold: 0 0 25px rgba(255, 215, 0, 0.25);
-  --shadow-teal: 0 0 25px rgba(0, 255, 255, 0.25);
-  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --shadow-gold: 0 0 20px rgba(212, 160, 0, 0.2);
+  --shadow-teal: 0 0 20px rgba(0, 136, 204, 0.2);
+  --shadow-card: 0 4px 20px 0 rgba(0, 0, 0, 0.1);
 }
 
 /* Global Box Sizing */
@@ -52,7 +52,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-deep);
+  background-color: #f0f2f8;
   color: var(--text-primary);
   font-family: var(--font-main);
   user-select: none;
@@ -88,7 +88,7 @@ html, body {
   height: 100%;
   max-width: 480px;
   margin: 0 auto;
-  background: #080a0f;
+  background: #f0f2f8;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -117,8 +117,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-glass);
-  background: rgba(10, 11, 14, 0.95);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   z-index: 50;
 }
@@ -642,7 +642,7 @@ html, body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #12151e;
+  background: #ffffff;
   border: 2px solid var(--accent-teal);
   color: var(--accent-teal);
   font-size: 0.85rem;
@@ -1159,8 +1159,8 @@ html, body {
   max-width: 480px;
   margin: 0 auto;
   height: 58px;
-  background: rgba(10, 11, 14, 0.98);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.97);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -1212,8 +1212,8 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
   z-index: 200;
   display: flex;
   justify-content: center;

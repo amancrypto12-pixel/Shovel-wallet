@@ -147,14 +147,14 @@ export function showTonWalletDetailsModal() {
       </div>
       <div class="modal-title">TON Wallet Connected</div>
       
-      <div style="width: 100%; background: #12151e; padding: 12px; border-radius: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px;">
+      <div style="width: 100%; background: #f1f5f9; padding: 12px; border-radius: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
           <span style="color: var(--text-secondary);">Provider:</span>
           <b style="color: white;">${tw.walletName || 'TON Wallet'}</b>
         </div>
         <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem;">
           <span style="color: var(--text-secondary);">Real TON Address:</span>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; font-family: monospace; font-size: 0.72rem; color: var(--accent-teal); word-break: break-all; border: 1px solid rgba(0,255,255,0.2);">
+          <div style="background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px; font-family: monospace; font-size: 0.72rem; color: var(--accent-teal); word-break: break-all; border: 1px solid rgba(0,255,255,0.2);">
             ${fullAddr}
           </div>
         </div>
@@ -271,7 +271,7 @@ export function showWelcomeModal() {
 
       <div style="width: 100%;">
         <input type="text" id="welcome-ref-input" placeholder="Enter Referral Code (e.g. ref_shovel99281)" 
-          style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #12151e; color: white; margin-bottom: 12px;" />
+          style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #f1f5f9; color: white; margin-bottom: 12px;" />
       </div>
 
       <button class="modal-close-btn" id="start-mining-btn">
@@ -366,7 +366,7 @@ export function showRewardedAdModal(onAdComplete) {
           Live on Telegram: Real Monetag ads will appear
         </div>
       </div>
-      <button class="modal-close-btn" id="ad-complete-btn" disabled style="background: #334155; color: #94a3b8;">
+      <button class="modal-close-btn" id="ad-complete-btn" disabled style="background: #e2e8f0; color: #64748b;">
         Watching Ad... (${seconds}s)
       </button>
     </div>
@@ -469,7 +469,7 @@ export function showConfirmSwapModal({ fromToken, toToken, fromAmount, toAmount 
       <div class="modal-icon-hero" style="color: var(--accent-teal);"><i class="fa-solid fa-rotate"></i></div>
       <div class="modal-title">Confirm Shovel DEX Swap</div>
       
-      <div class="modal-text" style="width: 100%; text-align: left; background: #12151e; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
+      <div class="modal-text" style="width: 100%; text-align: left; background: #f1f5f9; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--text-secondary);">You Pay:</span>
           <b style="color: white;">${fromAmount.toLocaleString()} ${fromToken}</b>

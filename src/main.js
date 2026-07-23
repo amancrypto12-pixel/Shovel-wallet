@@ -107,8 +107,8 @@ function initTelegramWebApp() {
     
     // Customize Telegram Header Color
     try {
-      tg.setHeaderColor('#0a0b0e');
-      tg.setBackgroundColor('#0a0b0e');
+      tg.setHeaderColor('#ffffff');
+      tg.setBackgroundColor('#f0f2f8');
     } catch (e) {
       // Ignored if older TG version
     }
