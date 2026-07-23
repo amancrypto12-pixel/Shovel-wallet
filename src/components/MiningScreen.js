@@ -9,6 +9,7 @@
 import { store } from '../state.js';
 import { soundEngine } from '../audio.js';
 import { showRewardedAdModal, showToast } from './Modals.js';
+import { STAR_PRODUCTS, purchaseWithStars } from '../telegramPay.js';
 
 let miningTimerInterval = null;
 
@@ -101,6 +102,38 @@ export function renderMiningScreen(container, particleEngine) {
       </div>
       <button class="boost-ad-btn" id="watch-ad-btn">⚡ 2x Speed</button>
     </div>
+
+    <!-- ⭐ Telegram Stars Premium Store -->
+    <div style="width:100%; margin-top: 4px;">
+      <div class="section-subtitle" style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+        <span style="font-size:1.1rem;">⭐</span>
+        <span>Premium Store</span>
+        <span style="font-size:0.68rem; background: linear-gradient(135deg,#f59e0b,#d97706); color:#fff; padding:2px 7px; border-radius:99px; font-weight:800; margin-left:4px;">STARS</span>
+      </div>
+
+      ${Object.values(STAR_PRODUCTS).map(p => `
+        <div class="glass-card premium-store-card" id="store-card-${p.id}" style="border-color: ${p.color}22; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:10px; width:100%;">
+            <!-- Icon Circle -->
+            <div style="width:44px; height:44px; border-radius:50%; background:${p.gradient}; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; box-shadow: 0 0 12px ${p.color}55;">
+              ${p.icon}
+            </div>
+            <!-- Info -->
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                <span style="font-weight:800; font-size:0.82rem; color:var(--text-primary);">${p.title}</span>
+                <span style="font-size:0.62rem; background:${p.color}22; color:${p.color}; padding:1px 6px; border-radius:99px; font-weight:700; border: 1px solid ${p.color}44;">${p.tag}</span>
+              </div>
+              <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px; line-height:1.3;">${p.description}</div>
+            </div>
+            <!-- Price Button -->
+            <button class="stars-buy-btn" data-product="${p.id}" style="background:${p.gradient}; flex-shrink:0;">
+              ⭐ ${p.stars.toLocaleString()}
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
   `;
 
   // Attach Click Listener to Main Mining Button
@@ -141,6 +174,53 @@ export function renderMiningScreen(container, particleEngine) {
     showRewardedAdModal(() => {
       store.applyAdBoost();
       showToast('⚡ 2x Speed Boost Activated!');
+    });
+  });
+
+  // ⭐ Telegram Stars Premium Store — Buy button handlers
+  container.querySelectorAll('.stars-buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      soundEngine.playSwapSuccess();
+      const productKey = btn.dataset.product;
+
+      purchaseWithStars(productKey, (key) => {
+        // Grant reward based on product
+        switch (key) {
+          case 'ads_free_lifetime':
+            store.state.premiumAdsFreeLt = true;
+            store.saveState();
+            showToast('♾️ Ads Free Lifetime Activated! No more ads ever!');
+            break;
+          case 'daily_claim':
+            store.state.dailyClaimUnlocked = true;
+            store.state.balances.SHOVEL += 500;
+            store.state.transactions.unshift({ type: 'MINE', title: '🎁 Daily 500 SHOVEL Claim', amount: '+500 SHOVEL', time: 'Just now', isPositive: true });
+            store.saveState();
+            showToast('🎁 +500 SHOVEL Claimed! Come back daily for more!');
+            break;
+          case 'vip_pass':
+            store.state.user.isVip = true;
+            store.state.user.isLegend = true;
+            store.state.transactions.unshift({ type: 'MINE', title: '👑 VIP Legend Pass Activated', amount: 'Legend Badge', time: 'Just now', isPositive: true });
+            store.saveState();
+            showToast('👑 VIP Legend Pass Activated! Legend badge added to profile!');
+            renderMiningScreen(container, particleEngine);
+            break;
+          case 'monthly_sub':
+            store.state.monthlySubEnd = Date.now() + 30 * 24 * 3600 * 1000;
+            store.state.premiumAdsFreeLt = true;
+            store.state.autoMining.boostMultiplier = 3.0;
+            store.state.autoMining.boostEnd = Date.now() + 30 * 24 * 3600 * 1000;
+            store.saveState();
+            showToast('💎 Monthly Premium Active! Ads free + 3x rewards for 30 days!');
+            break;
+          case 'auto_farm':
+            store.state.autoFarmEnd = Date.now() + 30 * 24 * 3600 * 1000;
+            store.saveState();
+            showToast('🤖 24H Auto-Farm Active for 30 days! Earning while you sleep!');
+            break;
+        }
+      });
     });
   });
 

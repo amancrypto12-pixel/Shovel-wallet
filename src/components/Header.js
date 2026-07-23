@@ -22,7 +22,7 @@ export function renderHeader(container) {
         <div class="username">
           ${state.user.name}
           <i class="fa-solid fa-circle-check tg-badge"></i>
-          ${state.user.isVip ? '<span style="font-size: 0.7rem; color: var(--accent-gold);">👑 VIP</span>' : ''}
+          ${state.user.isLegend ? '<span style="font-size: 0.7rem; background: linear-gradient(135deg,#d4a000,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:900;">👑 LEGEND</span>' : state.user.isVip ? '<span style="font-size: 0.7rem; color: var(--accent-gold);">👑 VIP</span>' : ''}
         </div>
       </div>
     </div>

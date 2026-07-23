@@ -1311,3 +1311,125 @@ html, body {
   0%, 100% { transform: scale(0.9); opacity: 0.35; }
   50% { transform: scale(1.05); opacity: 0.75; }
 }
+
+/* ===================================================================
+   ⭐ TELEGRAM STARS PREMIUM STORE CARDS
+   =================================================================== */
+
+.premium-store-card {
+  padding: 11px 13px;
+  border: 1.5px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  width: 100%;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.premium-store-card:active {
+  transform: scale(0.98);
+}
+
+.stars-buy-btn {
+  border: none;
+  border-radius: 99px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 7px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.12s ease, opacity 0.12s ease;
+  min-width: 72px;
+  text-align: center;
+}
+
+.stars-buy-btn:active {
+  transform: scale(0.92);
+  opacity: 0.85;
+}
+
+/* ===================================================================
+   TOKEN ICON FIX — Perfect alignment in Portfolio Holdings
+   =================================================================== */
+
+.token-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.5);
+  border: 1.5px solid rgba(0,0,0,0.06);
+}
+
+.token-icon-wrap svg,
+.token-icon-wrap img {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.token-holding-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 14px;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+
+.token-holding-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.token-holding-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.token-holding-name {
+  font-weight: 700;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.token-holding-sym {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.token-holding-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.token-holding-amt {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.token-holding-usd {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
