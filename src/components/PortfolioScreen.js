@@ -48,14 +48,14 @@ export function renderPortfolioScreen(container) {
 
       <!-- Action Buttons Row -->
       <div class="portfolio-actions-row">
-        <button class="wallet-act-btn primary" id="deposit-faucet-btn" ${isFaucetCooldown ? 'disabled style="background: #334155; color: #94a3b8; box-shadow: none;"' : ''}>
+        <button class="wallet-act-btn primary" id="deposit-faucet-btn" ${isFaucetCooldown ? 'disabled style="background: #e2e8f0; color: #94a3b8; box-shadow: none;"' : ''}>
           <i class="fa-solid fa-download"></i> 
           ${isFaucetCooldown ? `Cooldown (${remHours}h ${remMins}m)` : 'Faucet'}
         </button>
         
         <button class="wallet-act-btn" id="connect-ton-wallet-btn" style="background: ${isWalletConnected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0, 136, 204, 0.2)'}; border-color: ${isWalletConnected ? 'var(--accent-green)' : '#0088cc'}; color: ${isWalletConnected ? 'var(--accent-green)' : '#0088cc'}; font-weight: 800;">
           <i class="${isWalletConnected ? 'fa-solid fa-circle-check' : 'fa-solid fa-link'}"></i> 
-          ${isWalletConnected ? `${walletAddr.slice(0, 4)}...${walletAddr.slice(-4)}` : 'Connect TON'}
+          ${isWalletConnected && walletAddr ? `${walletAddr.slice(0, 6)}...${walletAddr.slice(-4)}` : isWalletConnected ? 'Connected' : 'Connect TON'}
         </button>
       </div>
     </div>

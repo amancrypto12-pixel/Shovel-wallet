@@ -40,16 +40,20 @@ export function renderSwapScreen(container) {
   }
 
   function renderUI() {
+    // Always read fresh state (fixes stale balance bug after swap)
+    const liveState = store.getState();
     const toAmount = calculateToAmount(fromAmount);
-    const fromBalance = state.balances[fromToken] || 0;
-    const toBalance = state.balances[toToken] || 0;
+    const fromBalance = liveState.balances[fromToken] || 0;
+    const toBalance = liveState.balances[toToken] || 0;
     const fee = 0.1;
     const requiredFrom = fromToken === 'SHOVEL' ? fromAmount + fee : fromAmount;
     const isInsufficient = requiredFrom > fromBalance;
     const isInvalid = !fromAmount || fromAmount <= 0;
+    const isSameToken = fromToken === toToken;
 
     let buttonText = `SWAP ${fromAmount || 0} ${fromToken} ➔ ${toToken}`;
-    if (isInvalid) buttonText = 'Enter Amount';
+    if (isSameToken) buttonText = 'Select different tokens';
+    else if (isInvalid) buttonText = 'Enter Amount';
     else if (isInsufficient) buttonText = `Insufficient ${fromToken} Balance`;
 
     const swapsCount = state.totalSwapsCount || 0;
@@ -115,7 +119,7 @@ export function renderSwapScreen(container) {
       </div>
 
       <!-- MAIN SWAP ACTION BUTTON -->
-      <button class="main-swap-action-btn" id="execute-swap-btn" ${isInsufficient || isInvalid ? 'disabled' : ''}>
+      <button class="main-swap-action-btn" id="execute-swap-btn" ${isInsufficient || isInvalid || isSameToken ? 'disabled' : ''}>
         ${buttonText}
       </button>
 
@@ -168,14 +172,17 @@ export function renderSwapScreen(container) {
     const inputField = container.querySelector('#from-amount-input');
     const updateSwapState = (newVal) => {
       fromAmount = parseFloat(newVal) || 0;
+      // Always read fresh live balances (fixes stale balance bug)
+      const freshBalance = store.getState().balances[fromToken] || 0;
       const toField = container.querySelector('#to-amount-input');
       const actionBtn = container.querySelector('#execute-swap-btn');
       if (toField) toField.value = calculateToAmount(fromAmount);
       if (actionBtn) {
-        const checkInsuff = (fromToken === 'SHOVEL' ? fromAmount + fee : fromAmount) > fromBalance;
+        const checkSame = fromToken === toToken;
+        const checkInsuff = (fromToken === 'SHOVEL' ? fromAmount + fee : fromAmount) > freshBalance;
         const checkInval = !fromAmount || fromAmount <= 0;
-        actionBtn.disabled = checkInsuff || checkInval;
-        actionBtn.textContent = checkInval ? 'Enter Amount' : checkInsuff ? `Insufficient ${fromToken} Balance` : `SWAP ${fromAmount} ${fromToken} ➔ ${toToken}`;
+        actionBtn.disabled = checkSame || checkInsuff || checkInval;
+        actionBtn.textContent = checkSame ? 'Select different tokens' : checkInval ? 'Enter Amount' : checkInsuff ? `Insufficient ${fromToken} Balance` : `SWAP ${fromAmount} ${fromToken} ➔ ${toToken}`;
       }
     };
 
@@ -188,7 +195,9 @@ export function renderSwapScreen(container) {
       chip.addEventListener('click', () => {
         soundEngine.playTabClick();
         const pct = parseFloat(chip.dataset.pct);
-        let calcAmt = fromBalance * pct;
+        // Read fresh balance for presets too
+        const freshBal = store.getState().balances[fromToken] || 0;
+        let calcAmt = freshBal * pct;
         if (fromToken === 'SHOVEL' && calcAmt > fee) calcAmt = Math.max(0, calcAmt - fee);
         calcAmt = parseFloat(calcAmt.toFixed(4));
         if (inputField) inputField.value = calcAmt;

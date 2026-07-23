@@ -29,7 +29,7 @@ export function renderHeader(container) {
 
     <!-- Right Controls: Theme Switcher & Balance Pill -->
     <div style="display: flex; align-items: center; gap: 8px;">
-      <button id="theme-switcher-btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--accent-gold); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem;" title="Switch Background UI Theme">
+      <button id="theme-switcher-btn" style="background: var(--bg-input); border: 1px solid var(--border-glass); color: var(--accent-gold); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem;" title="Switch Background UI Theme">
         🎨
       </button>
 

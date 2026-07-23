@@ -2,9 +2,10 @@
    SUPABASE DATABASE & REALTIME PERSISTENCE INTEGRATION (Shovel Wallet)
    ========================================================================== */
 
-// Supabase Configuration (Replace with your Supabase Project URL & Anon Key)
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+// Supabase Configuration — uses Vite env variables (set in .env file)
+// VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set in .env
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const supabaseConfig = {
   url: SUPABASE_URL,
