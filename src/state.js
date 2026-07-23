@@ -16,6 +16,46 @@ function getTelegramUserId() {
   return 'guest_browser';
 }
 
+// --- Clear ALL old/legacy localStorage keys (one-time migration) ---
+// Deletes old shared keys like SHOVEL_WALLET_STATE_V1 through V5
+// so no user sees stale/fake demo data ever again.
+function clearOldStorage() {
+  try {
+    const OLD_KEYS = [
+      'SHOVEL_WALLET_STATE_V1',
+      'SHOVEL_WALLET_STATE_V2',
+      'SHOVEL_WALLET_STATE_V3',
+      'SHOVEL_WALLET_STATE_V4',
+      'SHOVEL_WALLET_STATE_V5',
+      'SHOVEL_WALLET_STATE',      // any no-version key
+      'shovel_wallet_state',      // lowercase variant
+    ];
+
+    // Remove exact old keys
+    OLD_KEYS.forEach(key => localStorage.removeItem(key));
+
+    // Also scan & remove any key matching old pattern (no user ID in key)
+    const keysToDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (
+        key &&
+        key.startsWith('SHOVEL_WALLET_') &&
+        !key.includes('_V6')       // V6 = new per-user keys — keep these
+      ) {
+        keysToDelete.push(key);
+      }
+    }
+    keysToDelete.forEach(key => localStorage.removeItem(key));
+
+    if (keysToDelete.length > 0 || OLD_KEYS.some(k => localStorage.getItem(k))) {
+      console.log(`[ShovelWallet] Cleared ${keysToDelete.length} old storage keys`);
+    }
+  } catch (e) {
+    console.warn('Storage cleanup error:', e);
+  }
+}
+
 // --- Get Referral Code from Telegram start_param (deep link) ---
 export function getReferralCodeFromTelegram() {
   try {
@@ -134,6 +174,9 @@ class StateStore {
 
   // Call this AFTER Telegram WebApp SDK is ready
   initForUser() {
+    // Step 1: Clear all old shared/legacy keys first (one-time migration)
+    clearOldStorage();
+    // Step 2: Load this user's own isolated state
     this._userId = getTelegramUserId();
     this._storageKey = `SHOVEL_WALLET_${this._userId}_V6`;
     this.state = this._loadState();
