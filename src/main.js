@@ -119,5 +119,24 @@ function initTelegramWebApp() {
     } catch (e) {
       // Ignored if older TG version
     }
+
+    // CRITICAL: Disable vertical swipes so Telegram doesn't
+    // intercept scroll events inside the Mini App
+    try {
+      tg.disableVerticalSwipes();
+    } catch (e) {
+      // Older Telegram versions may not support this
+    }
+
+    // Allow scroll on the viewport element directly
+    const viewport = document.getElementById('app-viewport');
+    if (viewport) {
+      viewport.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+      viewport.addEventListener('touchmove', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+    }
   }
 }

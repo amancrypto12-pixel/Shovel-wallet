@@ -58,7 +58,8 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: none;
+  /* touch-action: pan-y allows vertical scroll while blocking horizontal */
+  touch-action: pan-y;
 }
 
 /* Background Canvas Layer */
@@ -214,13 +215,14 @@ html, body {
   flex: 1 1 0%;
   min-height: 0;
   width: 100%;
-  overflow-y: auto;
+  overflow-y: scroll;              /* Always show scrollable — not just auto */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-  padding: 10px 12px 80px 12px;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y pinch-zoom;  /* Allow vertical scroll + pinch zoom */
+  padding: 10px 12px 90px 12px;    /* Extra bottom padding for nav bar */
   position: relative;
+  scroll-behavior: smooth;
 }
 
 .app-viewport::-webkit-scrollbar {
@@ -238,10 +240,11 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  /* overflow: visible — let content grow and viewport scroll */
+  overflow: visible;
   animation: screen-fade-in 0.2s ease forwards;
 }
 

@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Allow vertical scroll in Telegram WebApp; only lock horizontal -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    /* Telegram WebApp scroll fix — must be inline before CSS loads */
+    html { overflow: hidden; }
+    body { overflow: hidden; touch-action: pan-y; }
+    #app-viewport { overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; }
+  </style>
   <title>Shovel Wallet — Mining & Swap DEX</title>
   <link rel="icon" type="image/png" href="/shovel_logo.png">
   
@@ -20,7 +27,7 @@
   <!-- Monetag Rewarded Popup Ad SDK (Zone ID: 11375018) -->
   <script src='//libtl.com/sdk.js' data-zone='11375018' data-sdk='show_11375018'></script>
 </head>
-<body class="dark-theme">
+<body>
   <!-- Interactive Canvas Background -->
   <canvas id="bg-canvas"></canvas>
   <canvas id="particle-canvas"></canvas>
