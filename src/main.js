@@ -105,15 +105,34 @@ document.addEventListener('DOMContentLoaded', () => {
         maximumFractionDigits: 2
       });
     }
+
+    // Also live-update Swap screen balance labels when on swap tab
+    // (fixes the "From balance shows 16, header shows 8" mismatch)
+    if (state.activeTab === 'swap') {
+      const fromBalLbl = document.querySelector('.swap-balance-lbl span');
+      if (fromBalLbl) {
+        // Re-read current fromToken from the selector button text to format correctly
+        const fromTokenEl = document.querySelector('#from-token-btn span');
+        const currentFromToken = fromTokenEl ? fromTokenEl.textContent.trim() : 'SHOVEL';
+        const freshBal = state.balances[currentFromToken] || 0;
+        fromBalLbl.textContent = `${freshBal.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 4
+        })} ${currentFromToken}`;
+      }
+    }
   });
 
   // 11. Initial First Render
   renderApp(store.getState());
 
-  // 12. Monetag In-App Interstitial — auto-shows 2 ads (5s delay, 30s interval)
+  // 12. Monetag In-App Interstitial
+  // DELAY: Start 3 minutes after load (not 5 seconds) to avoid conflicting with early swaps.
+  // The swap/payment flows are ad-free by design. The auto-interstitial must not fire
+  // during or immediately after swap actions. window._swapActive flag is also checked.
   setTimeout(() => {
     startMonetagInAppInterstitial();
-  }, 6000);
+  }, 180000); // 3 minutes = 180,000ms
 });
 
 function initTelegramWebApp() {

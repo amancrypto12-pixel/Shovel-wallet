@@ -321,15 +321,22 @@ function monetagSDK() {
 export function startMonetagInAppInterstitial() {
   const sdk = monetagSDK();
   if (!sdk) return;
+
+  // Guard: If swap or payment is in progress, delay ad start by 15s and retry
+  if (window._swapActive) {
+    setTimeout(() => startMonetagInAppInterstitial(), 15000);
+    return;
+  }
+
   try {
     sdk({
       type: 'inApp',
       inAppSettings: {
-        frequency: 2,   // Show 2 ads
-        capping: 0.1,   // Within 0.1 hours (6 minutes)
-        interval: 30,   // 30 second gap between ads
-        timeout: 5,     // 5 second delay before first ad
-        everyPage: false // Session saved across navigation
+        frequency: 2,   // Show 2 ads max per session
+        capping: 0.5,   // Within 0.5 hours (30 min window — was 6 min, too aggressive)
+        interval: 60,   // 60 second gap between ads (was 30s)
+        timeout: 10,    // 10 second delay before first ad (was 5s)
+        everyPage: false
       }
     });
   } catch (e) {
@@ -508,9 +515,13 @@ export function showConfirmSwapModal({ fromToken, toToken, fromAmount, toAmount 
     </div>
   `;
 
-  container.classList.remove('hidden');
+  // Mark swap as active — prevents Monetag auto-interstitial from firing during swap
+  window._swapActive = true;
 
-  container.querySelector('#cancel-swap-btn')?.addEventListener('click', hideModal);
+  container.querySelector('#cancel-swap-btn')?.addEventListener('click', () => {
+    window._swapActive = false;
+    hideModal();
+  });
 
   container.querySelector('#confirm-swap-action')?.addEventListener('click', () => {
     const btn = container.querySelector('#confirm-swap-action');
@@ -529,6 +540,8 @@ export function showConfirmSwapModal({ fromToken, toToken, fromAmount, toAmount 
         hideModal();
         showToast(`❌ Swap Failed: ${res.reason}`);
       }
+      // Clear swap lock after 10s so Monetag can resume after user is done
+      setTimeout(() => { window._swapActive = false; }, 10000);
     }, 1500);
   });
 }
