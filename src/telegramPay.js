@@ -62,6 +62,17 @@ export const STAR_PRODUCTS = {
     color: '#dc2626',
     gradient: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
     tag: '1 MONTH'
+  },
+  points_pack: {
+    id: 'points_pack',
+    title: '⚡ 10 SHOVEL Points',
+    description: 'Instantly get +10 SHOVEL points! Max 5 purchases per day.',
+    icon: '⚡',
+    stars: 1,
+    color: '#0ea5e9',
+    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
+    tag: '5/DAY LIMIT',
+    dailyLimit: 5
   }
 };
 

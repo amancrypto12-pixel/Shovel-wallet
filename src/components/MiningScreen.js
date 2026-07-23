@@ -58,16 +58,17 @@ export function renderMiningScreen(container, particleEngine) {
     </div>
 
     <!-- Live Yield Counter Card -->
-    <div class="glass-card" style="width: 100%; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; overflow: hidden;">
+    <div class="glass-card" style="width: 100%; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; min-height: 56px; flex-shrink: 0;">
       <div style="text-align: left; min-width: 0; flex: 1;">
-        <div style="font-size: 0.7rem; color: var(--text-secondary);">Session Yield</div>
-        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.92rem; color: var(--accent-teal); white-space: nowrap;" id="live-yield-counter">
+        <div style="font-size: 0.68rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Session Yield</div>
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 1rem; color: var(--accent-teal);" id="live-yield-counter">
           ${calculateCurrentYield(state)} SHOVEL
         </div>
       </div>
+      <div style="width: 1px; height: 32px; background: var(--border-glass); flex-shrink: 0; margin: 0 12px;"></div>
       <div style="text-align: right; flex-shrink: 0;">
-        <div style="font-size: 0.7rem; color: var(--text-secondary);">Rate</div>
-        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.85rem; color: var(--accent-gold); white-space: nowrap;">
+        <div style="font-size: 0.68rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Rate</div>
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 1rem; color: var(--accent-gold);">
           ${getEffectiveRate(state).toFixed(1)} /HR
         </div>
       </div>
@@ -111,8 +112,14 @@ export function renderMiningScreen(container, particleEngine) {
         <span style="font-size:0.68rem; background: linear-gradient(135deg,#f59e0b,#d97706); color:#fff; padding:2px 7px; border-radius:99px; font-weight:800; margin-left:4px;">STARS</span>
       </div>
 
-      ${Object.values(STAR_PRODUCTS).map(p => `
-        <div class="glass-card premium-store-card" id="store-card-${p.id}" style="border-color: ${p.color}22; margin-bottom:8px;">
+      ${Object.values(STAR_PRODUCTS).map(p => {
+        const todayKey = `points_pack_day_${new Date().toISOString().slice(0, 10)}`;
+        const usedToday = p.dailyLimit ? parseInt(localStorage.getItem(todayKey) || '0') : 0;
+        const isLimitReached = p.dailyLimit && usedToday >= p.dailyLimit;
+        const limitLabel = p.dailyLimit ? `<span style="font-size:0.62rem; color:${isLimitReached ? '#ef4444' : '#22c55e'}; font-weight:700; margin-left:4px;">${usedToday}/${p.dailyLimit} today</span>` : '';
+
+        return `
+        <div class="glass-card premium-store-card" id="store-card-${p.id}" style="border-color: ${p.color}22; margin-bottom:8px; opacity:${isLimitReached ? '0.65' : '1'};">
           <div style="display:flex; align-items:center; gap:10px; width:100%;">
             <!-- Icon Circle -->
             <div style="width:44px; height:44px; border-radius:50%; background:${p.gradient}; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; box-shadow: 0 0 12px ${p.color}55;">
@@ -123,16 +130,17 @@ export function renderMiningScreen(container, particleEngine) {
               <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
                 <span style="font-weight:800; font-size:0.82rem; color:var(--text-primary);">${p.title}</span>
                 <span style="font-size:0.62rem; background:${p.color}22; color:${p.color}; padding:1px 6px; border-radius:99px; font-weight:700; border: 1px solid ${p.color}44;">${p.tag}</span>
+                ${limitLabel}
               </div>
               <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px; line-height:1.3;">${p.description}</div>
             </div>
             <!-- Price Button -->
-            <button class="stars-buy-btn" data-product="${p.id}" style="background:${p.gradient}; flex-shrink:0;">
-              ⭐ ${p.stars.toLocaleString()}
+            <button class="stars-buy-btn" data-product="${p.id}" style="background:${isLimitReached ? '#64748b' : p.gradient}; flex-shrink:0;" ${isLimitReached ? 'disabled' : ''}>
+              ${isLimitReached ? '✗ Limit' : `⭐ ${p.stars.toLocaleString()}`}
             </button>
           </div>
         </div>
-      `).join('')}
+      `}).join('')}
     </div>
   `;
 
@@ -183,6 +191,16 @@ export function renderMiningScreen(container, particleEngine) {
       soundEngine.playSwapSuccess();
       const productKey = btn.dataset.product;
 
+      // Daily limit check for points_pack
+      if (productKey === 'points_pack') {
+        const todayKey = `points_pack_day_${new Date().toISOString().slice(0, 10)}`;
+        const todayCount = parseInt(localStorage.getItem(todayKey) || '0');
+        if (todayCount >= 5) {
+          showToast('⚠️ Daily limit reached! Come back tomorrow (5/day max).');
+          return;
+        }
+      }
+
       purchaseWithStars(productKey, (key) => {
         // Grant reward based on product
         switch (key) {
@@ -219,6 +237,18 @@ export function renderMiningScreen(container, particleEngine) {
             store.saveState();
             showToast('🤖 24H Auto-Farm Active for 30 days! Earning while you sleep!');
             break;
+          case 'points_pack': {
+            // Credit 10 SHOVEL + increment daily counter
+            store.state.balances.SHOVEL += 10;
+            store.state.transactions.unshift({ type: 'MINE', title: '⚡ 10 SHOVEL Points Pack', amount: '+10 SHOVEL', time: 'Just now', isPositive: true });
+            store.saveState();
+            const todayKey = `points_pack_day_${new Date().toISOString().slice(0, 10)}`;
+            const newCount = parseInt(localStorage.getItem(todayKey) || '0') + 1;
+            localStorage.setItem(todayKey, String(newCount));
+            const remaining = 5 - newCount;
+            showToast(`⚡ +10 SHOVEL Added! ${remaining} purchase${remaining !== 1 ? 's' : ''} left today.`);
+            break;
+          }
         }
       });
     });
