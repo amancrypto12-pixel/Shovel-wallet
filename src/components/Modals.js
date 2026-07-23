@@ -295,14 +295,42 @@ export function showWelcomeModal() {
 
 const MONETAG_ZONE_ID = '11375018';
 
-// --- 2. Real Monetag Rewarded Popup Ad Integration ---
+// --- Monetag Helper: Get SDK function safely ---
+function monetagSDK() {
+  return typeof window[`show_${MONETAG_ZONE_ID}`] === 'function'
+    ? window[`show_${MONETAG_ZONE_ID}`]
+    : null;
+}
+
+// --- Monetag In-App Interstitial (Auto-shows on app load, no reward) ---
+// Automatically shows 2 ads within 6 minutes, 30s interval, 5s delay
+export function startMonetagInAppInterstitial() {
+  const sdk = monetagSDK();
+  if (!sdk) return;
+  try {
+    sdk({
+      type: 'inApp',
+      inAppSettings: {
+        frequency: 2,   // Show 2 ads
+        capping: 0.1,   // Within 0.1 hours (6 minutes)
+        interval: 30,   // 30 second gap between ads
+        timeout: 5,     // 5 second delay before first ad
+        everyPage: false // Session saved across navigation
+      }
+    });
+  } catch (e) {
+    console.warn('Monetag inApp error:', e);
+  }
+}
+
+// --- 2a. Rewarded Interstitial (for Mining Button — show_11375018()) ---
+// User watches ad → reward granted
 export function showRewardedAdModal(onAdComplete) {
-  // Check if real Monetag SDK is loaded
-  if (typeof window[`show_${MONETAG_ZONE_ID}`] === 'function') {
+  const sdk = monetagSDK();
+  if (sdk) {
     showToast('📺 Loading Ad...');
-    window[`show_${MONETAG_ZONE_ID}`]('pop')
+    sdk()                        // ← Rewarded Interstitial (no 'pop' arg)
       .then(() => {
-        // User watched ad till the end (or closed in interstitial format)
         soundEngine.playEnergyBoost();
         if (typeof onAdComplete === 'function') {
           onAdComplete();
@@ -312,7 +340,7 @@ export function showRewardedAdModal(onAdComplete) {
         }
       })
       .catch((e) => {
-        console.warn('Monetag ad error:', e);
+        console.warn('Monetag rewarded ad error:', e);
         showToast('⚠️ Ad error. Please try again.');
       });
     return;

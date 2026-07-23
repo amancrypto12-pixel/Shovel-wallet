@@ -529,10 +529,9 @@ html, body {
 /* Swap Card Container */
 .swap-card-container {
   width: 100%;
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 
 .swap-input-box {
@@ -631,31 +630,33 @@ html, body {
 
 /* Reverse Swap Button */
 .swap-reverse-btn-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: -6px 0;
   z-index: 5;
+  position: relative;
 }
 
 .swap-reverse-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #12151e;
   border: 2px solid var(--accent-teal);
   color: var(--accent-teal);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 0 15px var(--accent-teal-glow);
+  box-shadow: 0 0 12px var(--accent-teal-glow);
   transition: transform 0.3s ease;
+  flex-shrink: 0;
 }
 
-.swap-reverse-btn:hover {
-  transform: rotate(180deg) scale(1.1);
+.swap-reverse-btn:active {
+  transform: rotate(180deg) scale(0.95);
 }
 
 /* Main Action Swap Button */

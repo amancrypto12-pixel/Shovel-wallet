@@ -15,7 +15,7 @@ import { renderMiningScreen } from './components/MiningScreen.js';
 import { renderSwapScreen } from './components/SwapScreen.js';
 import { renderReferralScreen } from './components/ReferralScreen.js';
 import { renderPortfolioScreen } from './components/PortfolioScreen.js';
-import { showWelcomeModal, applyBgThemeToDOM } from './components/Modals.js';
+import { showWelcomeModal, applyBgThemeToDOM, startMonetagInAppInterstitial } from './components/Modals.js';
 import { initTonConnect } from './tonConnect.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -91,6 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 8. Initial First Render
   renderApp(store.getState());
+
+  // 9. Monetag In-App Interstitial — auto-shows 2 ads (5s delay, 30s interval)
+  // Only runs inside Telegram where SDK is loaded
+  setTimeout(() => {
+    startMonetagInAppInterstitial();
+  }, 6000);
 });
 
 function initTelegramWebApp() {
