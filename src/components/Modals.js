@@ -293,36 +293,32 @@ export function showWelcomeModal() {
   });
 }
 
-const ADSGRAM_BLOCK_ID = '59129';
+const MONETAG_ZONE_ID = '11375018';
 
-// --- 2. Real Adsgram Rewarded Video Ad Integration ---
+// --- 2. Real Monetag Rewarded Popup Ad Integration ---
 export function showRewardedAdModal(onAdComplete) {
-  // Check if real Adsgram SDK is available in Telegram WebApp
-  if (window.Adsgram) {
-    showToast('📺 Loading Real Adsgram Video Ad...');
-    try {
-      const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-      AdController.show().then((result) => {
-        // User watched 100% of the video ad
+  // Check if real Monetag SDK is loaded
+  if (typeof window[`show_${MONETAG_ZONE_ID}`] === 'function') {
+    showToast('📺 Loading Ad...');
+    window[`show_${MONETAG_ZONE_ID}`]('pop')
+      .then(() => {
+        // User watched ad till the end (or closed in interstitial format)
         soundEngine.playEnergyBoost();
-        showToast('✅ Ad Verified! Reward Granted!');
         if (typeof onAdComplete === 'function') {
           onAdComplete();
         } else {
           store.applyAdBoost();
           showToast('⚡ 2x Speed Boost Activated for 1 Hour!');
         }
-      }).catch((error) => {
-        console.warn('Adsgram Ad Error or Skipped:', error);
-        showToast('⚠️ Ad skipped or closed early: Full view required for reward');
+      })
+      .catch((e) => {
+        console.warn('Monetag ad error:', e);
+        showToast('⚠️ Ad error. Please try again.');
       });
-      return;
-    } catch (e) {
-      console.warn('Adsgram init exception:', e);
-    }
+    return;
   }
 
-  // Fallback simulator if testing locally or outside Telegram
+  // Fallback simulator when Monetag SDK not loaded (local dev / browser testing)
   const container = getModalContainer();
   if (!container) return;
 
@@ -331,12 +327,15 @@ export function showRewardedAdModal(onAdComplete) {
   container.innerHTML = `
     <div class="glass-card modal-card" style="border-color: var(--accent-purple);">
       <div class="modal-icon-hero" style="color: var(--accent-purple);"><i class="fa-solid fa-play"></i></div>
-      <div class="modal-title">Adsgram Ad Simulator</div>
+      <div class="modal-title">Monetag Ad (Zone: ${MONETAG_ZONE_ID})</div>
       <div class="modal-text">
-        Watching Adsgram Video Ad (Block ID: 59129)...
+        Loading Rewarded Popup Ad...
         <br><br>
         <div id="ad-countdown" style="font-family: 'Rubik', sans-serif; font-size: 2rem; font-weight: 900; color: var(--accent-purple);">
           00:0${seconds}
+        </div>
+        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 6px;">
+          Live on Telegram: Real Monetag ads will appear
         </div>
       </div>
       <button class="modal-close-btn" id="ad-complete-btn" disabled style="background: #334155; color: #94a3b8;">
@@ -351,16 +350,17 @@ export function showRewardedAdModal(onAdComplete) {
     seconds--;
     const countEl = container.querySelector('#ad-countdown');
     const btn = container.querySelector('#ad-complete-btn');
-
-    if (countEl) countEl.innerText = `00:0${seconds}`;
-
+    if (countEl) {
+      const s = String(seconds).padStart(2, '0');
+      countEl.innerText = `00:${s}`;
+    }
     if (seconds <= 0) {
       clearInterval(adTimer);
       if (btn) {
         btn.disabled = false;
         btn.style.background = 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)';
         btn.style.color = 'white';
-        btn.innerText = '⚡ Ad Verified! Claim Reward';
+        btn.innerText = '⚡ Ad Complete! Claim Reward';
       }
     }
   }, 1000);
