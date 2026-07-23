@@ -69,7 +69,7 @@ export function renderSwapScreen(container) {
         <div class="swap-input-box">
           <div class="swap-input-header">
             <span>From (Pay)</span>
-            <span class="swap-balance-lbl">Balance: <span>${fromBalance.toLocaleString()} ${fromToken}</span></span>
+            <span class="swap-balance-lbl">Balance: <span>${fromBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${fromToken}</span></span>
           </div>
           <div class="swap-input-row">
             <input type="number" step="any" min="0.000001" class="swap-number-input" id="from-amount-input" value="${fromAmount}" placeholder="0.0" />
@@ -256,24 +256,47 @@ export function renderSwapScreen(container) {
     });
 
     // Execute Swap Trigger
+    // AD-FREE: Swap button intentionally has NO ads — goes direct to confirm modal
     container.querySelector('#execute-swap-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
-      if (!isInsufficient && !isInvalid && !isSameToken) {
-        // Extra check: non-SHOVEL swap needs 0.1 SHOVEL for fee
-        if (fromToken !== 'SHOVEL') {
-          const shovelBal = store.getState().balances.SHOVEL || 0;
-          if (shovelBal < 0.1) {
-            showToast('⚠️ Need at least 0.1 SHOVEL to pay swap fee!');
-            return;
-          }
-        }
-        showConfirmSwapModal({
-          fromToken,
-          toToken,
-          fromAmount,
-          toAmount: calculateToAmount(fromAmount)
-        });
+
+      // Bug fix: Always recompute fresh values at click time — closure values can be stale
+      const freshState = store.getState();
+      const freshBalance = freshState.balances[fromToken] || 0;
+      const currentFee = 0.1;
+      const requiredNow = fromToken === 'SHOVEL' ? fromAmount + currentFee : fromAmount;
+      const freshInsufficient = requiredNow > freshBalance;
+      const freshInvalid = !fromAmount || fromAmount <= 0;
+      const freshSameToken = fromToken === toToken;
+
+      if (freshSameToken) {
+        showToast('⚠️ Select two different tokens to swap!');
+        return;
       }
+      if (freshInvalid) {
+        showToast('⚠️ Enter a valid amount to swap!');
+        return;
+      }
+      if (freshInsufficient) {
+        showToast(`⚠️ Insufficient ${fromToken} balance!`);
+        return;
+      }
+      // Non-SHOVEL swaps need 0.1 SHOVEL for fee
+      if (fromToken !== 'SHOVEL') {
+        const shovelBal = freshState.balances.SHOVEL || 0;
+        if (shovelBal < currentFee) {
+          showToast(`⚠️ Need at least ${currentFee} SHOVEL to pay swap fee!`);
+          return;
+        }
+      }
+
+      // All checks passed — open confirm modal (NO ad)
+      showConfirmSwapModal({
+        fromToken,
+        toToken,
+        fromAmount,
+        toAmount: calculateToAmount(fromAmount)
+      });
     });
 
     // Task 0 Claim — 5 swaps → 50 SHOVEL

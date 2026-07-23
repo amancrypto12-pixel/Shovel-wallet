@@ -35,7 +35,7 @@ export function renderHeader(container) {
 
       <div class="header-balance-pill" id="header-balance-pill">
         <img src="/shovel_logo.png" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;" />
-        <span class="balance-amount">${balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+        <span class="balance-amount">${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
       </div>
     </div>
   `;

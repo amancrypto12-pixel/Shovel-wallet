@@ -95,6 +95,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 10. Subscribe to State Changes
   store.subscribe((state) => {
     renderApp(state);
+
+    // Always sync header balance pill on EVERY state change (mining ticks, swaps, purchases)
+    // This fixes the stale balance bug (header showed old value after mining yield)
+    const balancePill = document.querySelector('.balance-amount');
+    if (balancePill) {
+      balancePill.textContent = state.balances.SHOVEL.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
   });
 
   // 11. Initial First Render
