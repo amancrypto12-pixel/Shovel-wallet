@@ -331,27 +331,33 @@ class StateStore {
   executeSwap(fromToken, toToken, fromAmount, toAmount) {
     const fee = 0.1;
     const requiredFrom = fromToken === 'SHOVEL' ? fromAmount + fee : fromAmount;
+    // toAmount may arrive as a string from calculateToAmount() — always parse it
+    const toAmountNum = parseFloat(toAmount) || 0;
 
+    // Check sufficient fromToken balance
     if ((this.state.balances[fromToken] || 0) < requiredFrom) {
       return { success: false, reason: `Insufficient ${fromToken} balance` };
+    }
+
+    // For non-SHOVEL swaps, SHOVEL fee must also be payable
+    if (fromToken !== 'SHOVEL' && (this.state.balances.SHOVEL || 0) < fee) {
+      return { success: false, reason: `Need at least ${fee} SHOVEL to pay swap fee` };
     }
 
     if (fromToken === 'SHOVEL') {
       this.state.balances.SHOVEL -= requiredFrom;
     } else {
       this.state.balances[fromToken] -= fromAmount;
-      if (this.state.balances.SHOVEL >= fee) {
-        this.state.balances.SHOVEL -= fee;
-      }
+      this.state.balances.SHOVEL -= fee;
     }
 
-    this.state.balances[toToken] = (this.state.balances[toToken] || 0) + toAmount;
+    this.state.balances[toToken] = (this.state.balances[toToken] || 0) + toAmountNum;
     this.state.totalSwapsCount = (this.state.totalSwapsCount || 0) + 1;
 
     this.state.transactions.unshift({
       type: 'SWAP',
       title: `Swap ${fromToken} ➔ ${toToken} (Fee: ${fee} SHOVEL)`,
-      amount: `-${fromAmount.toLocaleString()} ${fromToken} / +${toAmount} ${toToken}`,
+      amount: `-${fromAmount.toLocaleString()} ${fromToken} / +${toAmountNum.toFixed(4)} ${toToken}`,
       time: 'Just now',
       isPositive: true
     });

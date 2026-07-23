@@ -56,7 +56,7 @@ export function renderSwapScreen(container) {
     else if (isInvalid) buttonText = 'Enter Amount';
     else if (isInsufficient) buttonText = `Insufficient ${fromToken} Balance`;
 
-    const swapsCount = state.totalSwapsCount || 0;
+    const swapsCount = liveState.totalSwapsCount || 0;
 
     container.innerHTML = `
       <div class="screen-header-title">
@@ -243,7 +243,15 @@ export function renderSwapScreen(container) {
     // Execute Swap Trigger
     container.querySelector('#execute-swap-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
-      if (!isInsufficient && !isInvalid) {
+      if (!isInsufficient && !isInvalid && !isSameToken) {
+        // Extra check: non-SHOVEL swap needs 0.1 SHOVEL for fee
+        if (fromToken !== 'SHOVEL') {
+          const shovelBal = store.getState().balances.SHOVEL || 0;
+          if (shovelBal < 0.1) {
+            showToast('⚠️ Need at least 0.1 SHOVEL to pay swap fee!');
+            return;
+          }
+        }
         showConfirmSwapModal({
           fromToken,
           toToken,
