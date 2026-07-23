@@ -142,6 +142,7 @@ function createFreshState(userId) {
     faucetLastClaimedAt: 0,
     totalSwapsCount: 0,
     tasksClaimed: {
+      task0: false,
       task1: false,
       task2: false,
       task3: false
@@ -277,6 +278,8 @@ class StateStore {
   }
 
   startMiningSession() {
+    // Bug#16 Fix: Don't restart if already active
+    if (this.state.autoMining.active) return;
     const now = Date.now();
     const durationHours = this.state.autoMining.sessionHours || 3;
     this.state.autoMining.active = true;
@@ -294,9 +297,13 @@ class StateStore {
     const elapsedMs = Math.min(now - mining.startTime, durationMs);
     const hoursElapsed = elapsedMs / (1000 * 3600);
 
+    // Bug#3 Fix: read actual boostMultiplier (not hardcoded 2x)
     const isBoostActive = mining.boostEnd > now;
     let rate = mining.ratePerHour;
-    if (isBoostActive) rate *= 2.0;
+    if (isBoostActive) {
+      const mult = mining.boostMultiplier || 2.0;
+      rate *= mult;
+    }
     if (this.state.user.isVip) rate *= 3.0;
 
     const yieldAmount = parseFloat((hoursElapsed * rate).toFixed(4));
@@ -315,6 +322,11 @@ class StateStore {
     mining.active = false;
     mining.startTime = 0;
     mining.endTime = 0;
+
+    // Bug#14 Fix: cap transactions at 50 to prevent localStorage overflow
+    if (this.state.transactions.length > 50) {
+      this.state.transactions = this.state.transactions.slice(0, 50);
+    }
 
     this.saveState();
     return yieldAmount;
@@ -440,10 +452,16 @@ class StateStore {
     setInterval(() => {
       const now = Date.now();
       const mining = this.state.autoMining;
-      if (mining.active) {
-        if (now >= mining.endTime) {
-          this.claimMiningYield();
-        }
+
+      // Auto-claim when session ends
+      if (mining.active && now >= mining.endTime) {
+        this.claimMiningYield();
+      }
+
+      // Bug#4 Fix: Auto-Farm — if autoFarmEnd is active and no session running, restart session
+      const autoFarmActive = this.state.autoFarmEnd && this.state.autoFarmEnd > now;
+      if (autoFarmActive && !mining.active) {
+        this.startMiningSession();
       }
     }, 1000);
   }

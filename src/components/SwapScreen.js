@@ -130,7 +130,18 @@ export function renderSwapScreen(container) {
           <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-teal);">${swapsCount} Total Swaps</span>
         </div>
 
-        <!-- Task 1: 1,000 Swaps -->
+        <!-- Task 0: 5 Swaps (Starter) -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; font-size: 0.82rem;">Task 0: Swap 5 Times</span>
+            <span style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">+50 SHOVEL 🎁</span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-secondary);">Progress: ${Math.min(swapsCount, 5)} / 5</div>
+          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+            <div style="width: ${Math.min((swapsCount / 5) * 100, 100)}%; height: 100%; background: var(--accent-green); border-radius: 4px; transition: width 0.3s;"></div>
+          </div>
+          ${swapsCount >= 5 && !liveState.tasksClaimed?.task0 ? `<button class="preset-chip" style="margin-top:4px; background: var(--accent-green); color: white; width:100%;" id="claim-task0-btn">✅ Claim 50 SHOVEL!</button>` : swapsCount >= 5 ? '<div style="font-size:0.72rem; color:var(--accent-green); font-weight:700;">✅ Claimed!</div>' : ''}
+        </div>
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 4px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="font-weight: 700; font-size: 0.82rem;">Task 1: Swap 1,000 Times</span>
@@ -140,6 +151,7 @@ export function renderSwapScreen(container) {
           <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
             <div style="width: ${Math.min(swapsCount / 10, 100)}%; height: 100%; background: var(--accent-gold); border-radius: 4px; transition: width 0.3s;"></div>
           </div>
+          ${swapsCount >= 1000 && !liveState.tasksClaimed?.task1 ? `<button class="preset-chip" style="margin-top:4px; background: var(--accent-gold); color:#050b14; width:100%;" id="claim-task1-btn">✅ Claim 2x Mining Boost!</button>` : swapsCount >= 1000 ? '<div style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">✅ Claimed!</div>' : ''}
         </div>
 
         <!-- Task 2: 10,000 Swaps -->
@@ -152,6 +164,7 @@ export function renderSwapScreen(container) {
           <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
             <div style="width: ${Math.min(swapsCount / 100, 100)}%; height: 100%; background: var(--accent-teal); border-radius: 4px; transition: width 0.3s;"></div>
           </div>
+          ${swapsCount >= 10000 && !liveState.tasksClaimed?.task2 ? `<button class="preset-chip" style="margin-top:4px; background: var(--accent-teal); color:#050b14; width:100%;" id="claim-task2-btn">✅ Claim 6H Mining Session!</button>` : swapsCount >= 10000 ? '<div style="font-size:0.72rem; color:var(--accent-teal); font-weight:700;">✅ Claimed!</div>' : ''}
         </div>
 
         <!-- Task 3: 100,000 Swaps -->
@@ -164,6 +177,8 @@ export function renderSwapScreen(container) {
           <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
             <div style="width: ${Math.min(swapsCount / 1000, 100)}%; height: 100%; background: var(--accent-purple); border-radius: 4px; transition: width 0.3s;"></div>
           </div>
+          ${swapsCount >= 100000 && !liveState.tasksClaimed?.task3 ? `<button class="preset-chip" style="margin-top:4px; background: var(--accent-purple); color:white; width:100%;" id="claim-task3-btn">✅ Claim VIP Legend Status!</button>` : swapsCount >= 100000 ? '<div style="font-size:0.72rem; color:var(--accent-purple); font-weight:700;">✅ Claimed!</div>' : ''}
+        </div>
       </div>
     </div>
     <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
@@ -259,6 +274,39 @@ export function renderSwapScreen(container) {
           toAmount: calculateToAmount(fromAmount)
         });
       }
+    });
+
+    // Task 0 Claim — 5 swaps → 50 SHOVEL
+    container.querySelector('#claim-task0-btn')?.addEventListener('click', () => {
+      soundEngine.playSwapSuccess();
+      if (!liveState.tasksClaimed?.task0 && liveState.totalSwapsCount >= 5) {
+        store.state.tasksClaimed = { ...store.state.tasksClaimed, task0: true };
+        store.state.balances.SHOVEL += 50;
+        store.state.transactions.unshift({ type: 'MINE', title: '🎁 Swap Task 0 Reward', amount: '+50 SHOVEL', time: 'Just now', isPositive: true });
+        store.saveState();
+        showToast('🎁 +50 SHOVEL Claimed! Task 0 Complete!');
+        renderUI();
+      }
+    });
+
+    // Task 1/2/3 Claim buttons
+    container.querySelector('#claim-task1-btn')?.addEventListener('click', () => {
+      soundEngine.playSwapSuccess();
+      const res = store.claimSwapTask('task1');
+      if (res?.success) { showToast(res.rewardMsg); renderUI(); }
+      else showToast(`⚠️ ${res?.reason}`);
+    });
+    container.querySelector('#claim-task2-btn')?.addEventListener('click', () => {
+      soundEngine.playSwapSuccess();
+      const res = store.claimSwapTask('task2');
+      if (res?.success) { showToast(res.rewardMsg); renderUI(); }
+      else showToast(`⚠️ ${res?.reason}`);
+    });
+    container.querySelector('#claim-task3-btn')?.addEventListener('click', () => {
+      soundEngine.playSwapSuccess();
+      const res = store.claimSwapTask('task3');
+      if (res?.success) { showToast(res.rewardMsg); renderUI(); }
+      else showToast(`⚠️ ${res?.reason}`);
     });
   }
 

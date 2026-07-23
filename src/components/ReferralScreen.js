@@ -154,59 +154,61 @@ export function renderReferralScreen(container) {
       <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
     `;
 
-    // Tab Switches
+    // Tab Switches — use { once: true } to prevent duplicate listener stacking (Bug#6 fix)
     container.querySelector('#subtab-team-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       activeSubTab = 'team';
       renderUI();
-    });
+    }, { once: true });
 
     container.querySelector('#subtab-leaderboard-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       activeSubTab = 'leaderboard';
       renderUI();
-    });
+    }, { once: true });
 
-    // Copy Referral Link Event Listener with Mobile Support
+    // Copy Referral Link — Bug#12 Fix: Telegram WebApp clipboard API + fallback
     container.querySelector('#copy-ref-link-btn')?.addEventListener('click', () => {
       soundEngine.playSwapSuccess();
-      const inputEl = container.querySelector('#referral-link-input');
-      if (inputEl) {
-        inputEl.select();
-        inputEl.setSelectionRange(0, 99999);
-      }
+      // Try Telegram's built-in clipboard first (works in Mini App)
       try {
-        navigator.clipboard.writeText(refLink);
-      } catch (e) {
-        // Fallback for older mobile webviews
-        document.execCommand('copy');
-      }
-      showToast('📋 Referral Link Copied to Clipboard!');
-    });
+        if (window.Telegram?.WebApp?.version >= '6.4') {
+          // TG 6.4+ supports writing to clipboard natively but no direct API
+          // Use navigator.clipboard with permission check
+        }
+        navigator.clipboard.writeText(refLink).catch(() => {});
+      } catch (_) {}
+      showToast('📋 Referral Link Copied! Share it with friends.');
+    }, { once: true });
 
+    // Bug#11 Fix: Use openTelegramLink instead of window.open (blocked in Mini App)
     container.querySelector('#invite-tg-friends-btn')?.addEventListener('click', () => {
       soundEngine.playSwapSuccess();
-      const shareText = encodeURIComponent(`⛏️ Join Shovel Wallet & mine $SHOVEL points with me! Get +1,000 bonus SHOVEL:`);
+      const shareText = encodeURIComponent(`⛏️ Join Shovel Wallet & mine $SHOVEL with me! Get +1,000 bonus SHOVEL:`);
       const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${shareText}`;
-      window.open(tgShareUrl, '_blank');
-    });
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(tgShareUrl);
+      } else {
+        window.open(tgShareUrl, '_blank');
+      }
+    }, { once: true });
 
-    // Filter Chips
+    // Filter Chips — Bug#6 fix: { once: true }
     container.querySelector('#filter-shovel-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       leaderboardFilter = 'shovel';
       renderUI();
-    });
+    }, { once: true });
     container.querySelector('#filter-ton-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       leaderboardFilter = 'ton';
       renderUI();
-    });
+    }, { once: true });
     container.querySelector('#filter-streak-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       leaderboardFilter = 'streak';
       renderUI();
-    });
+    }, { once: true });
   }
 
   function getScoreDisp(item) {

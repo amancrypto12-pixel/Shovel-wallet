@@ -490,7 +490,8 @@ export function showConfirmSwapModal({ fromToken, toToken, fromAmount, toAmount 
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--text-secondary);">You Receive (Est):</span>
-          <b style="color: var(--accent-teal);">${toAmount} ${toToken}</b>
+          <!-- Bug#9 Fix: format toAmount to avoid scientific notation -->
+          <b style="color: var(--accent-teal);">${parseFloat(toAmount) < 0.001 ? parseFloat(toAmount).toFixed(8) : parseFloat(toAmount).toFixed(4)} ${toToken}</b>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px;">
           <span style="color: var(--text-secondary);">Transaction Fee:</span>

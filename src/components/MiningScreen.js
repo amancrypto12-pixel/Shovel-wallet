@@ -12,6 +12,7 @@ import { showRewardedAdModal, showToast } from './Modals.js';
 import { STAR_PRODUCTS, purchaseWithStars } from '../telegramPay.js';
 
 let miningTimerInterval = null;
+const DAILY_CLAIM_KEY = (userId) => `daily_claim_last_${userId}`;
 
 export function renderMiningScreen(container, particleEngine) {
   const state = store.getState();
@@ -212,13 +213,33 @@ export function renderMiningScreen(container, particleEngine) {
             store.saveState();
             showToast('♾️ Ads Free Lifetime Activated! No more ads ever!');
             break;
-          case 'daily_claim':
-            store.state.dailyClaimUnlocked = true;
-            store.state.balances.SHOVEL += 500;
-            store.state.transactions.unshift({ type: 'MINE', title: '🎁 Daily 500 SHOVEL Claim', amount: '+500 SHOVEL', time: 'Just now', isPositive: true });
-            store.saveState();
-            showToast('🎁 +500 SHOVEL Claimed! Come back daily for more!');
+
+          case 'daily_claim': {
+            // Bug#2 Fix: enforce real 24h cooldown
+            const userId = store._userId || 'guest';
+            const claimKey = `daily_claim_last_${userId}`;
+            const lastClaim = parseInt(localStorage.getItem(claimKey) || '0');
+            const now = Date.now();
+            const cooldownMs = 24 * 60 * 60 * 1000;
+            if (lastClaim && (now - lastClaim) < cooldownMs) {
+              const remH = Math.ceil((cooldownMs - (now - lastClaim)) / 3600000);
+              showToast(`⏳ Daily claim available again in ${remH}h!`);
+            } else {
+              store.state.balances.SHOVEL += 500;
+              store.state.transactions.unshift({
+                type: 'MINE', title: '🎁 Daily 500 SHOVEL Claim',
+                amount: '+500 SHOVEL', time: 'Just now', isPositive: true
+              });
+              localStorage.setItem(claimKey, String(now));
+              store.saveState();
+              showToast('🎁 +500 SHOVEL Claimed! Come back in 24h for more!');
+              // Refresh balance display immediately
+              const balEl = container.querySelector('#main-mine-balance');
+              if (balEl) balEl.textContent = store.state.balances.SHOVEL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
             break;
+          }
+
           case 'vip_pass':
             store.state.user.isVip = true;
             store.state.user.isLegend = true;
@@ -227,6 +248,7 @@ export function renderMiningScreen(container, particleEngine) {
             showToast('👑 VIP Legend Pass Activated! Legend badge added to profile!');
             renderMiningScreen(container, particleEngine);
             break;
+
           case 'monthly_sub':
             store.state.monthlySubEnd = Date.now() + 30 * 24 * 3600 * 1000;
             store.state.premiumAdsFreeLt = true;
@@ -235,21 +257,33 @@ export function renderMiningScreen(container, particleEngine) {
             store.saveState();
             showToast('💎 Monthly Premium Active! Ads free + 3x rewards for 30 days!');
             break;
+
           case 'auto_farm':
             store.state.autoFarmEnd = Date.now() + 30 * 24 * 3600 * 1000;
+            store.state.premiumAdsFreeLt = true;
             store.saveState();
             showToast('🤖 24H Auto-Farm Active for 30 days! Earning while you sleep!');
             break;
+
           case 'points_pack': {
             // Credit 10 SHOVEL + increment daily counter
             store.state.balances.SHOVEL += 10;
-            store.state.transactions.unshift({ type: 'MINE', title: '⚡ 10 SHOVEL Points Pack', amount: '+10 SHOVEL', time: 'Just now', isPositive: true });
+            store.state.transactions.unshift({
+              type: 'MINE', title: '⚡ 10 SHOVEL Points Pack',
+              amount: '+10 SHOVEL', time: 'Just now', isPositive: true
+            });
             store.saveState();
-            const todayKey = `points_pack_day_${new Date().toISOString().slice(0, 10)}`;
+            const today = new Date().toISOString().slice(0, 10);
+            const todayKey = `points_pack_day_${today}`;
             const newCount = parseInt(localStorage.getItem(todayKey) || '0') + 1;
             localStorage.setItem(todayKey, String(newCount));
             const remaining = 5 - newCount;
             showToast(`⚡ +10 SHOVEL Added! ${remaining} purchase${remaining !== 1 ? 's' : ''} left today.`);
+            // Bug fix: immediately update balance shown on screen + re-render premium panel
+            const balEl = container.querySelector('#main-mine-balance');
+            if (balEl) balEl.textContent = store.state.balances.SHOVEL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            // Re-render the premium store section to update 0/5 counter display
+            renderMiningScreen(container, particleEngine);
             break;
           }
         }
@@ -279,7 +313,8 @@ export function renderMiningScreen(container, particleEngine) {
 
     const durationHours = s.autoMining.sessionHours || 3;
     const totalMs = durationHours * 3600 * 1000;
-    const circumference = 2 * Math.PI * 72; // ~452.4
+    // Bug#5 Fix: circumference = 2π × r=62 = ~390 (matches SVG + CSS dasharray)
+    const circumference = 2 * Math.PI * 62; // 389.6
 
     if (isMining && s.autoMining.endTime > now) {
       btn?.classList.add('mining-active-state');
@@ -329,7 +364,10 @@ export function renderMiningScreen(container, particleEngine) {
 
 function getEffectiveRate(s) {
   let rate = s.autoMining.ratePerHour;
-  if (s.autoMining.boostEnd > Date.now()) rate *= 2.0;
+  if (s.autoMining.boostEnd > Date.now()) {
+    // Bug#3 Fix: Use actual stored multiplier, not hardcoded 2x
+    rate *= (s.autoMining.boostMultiplier || 2.0);
+  }
   if (s.user.isVip) rate *= 3.0;
   return rate;
 }
