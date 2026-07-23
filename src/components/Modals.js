@@ -515,6 +515,8 @@ export function showConfirmSwapModal({ fromToken, toToken, fromAmount, toAmount 
     </div>
   `;
 
+  container.classList.remove('hidden'); // Show modal
+
   // Mark swap as active — prevents Monetag auto-interstitial from firing during swap
   window._swapActive = true;
 
