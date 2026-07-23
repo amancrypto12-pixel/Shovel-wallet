@@ -253,29 +253,40 @@ export function applyBgThemeToDOM(themeId) {
 }
 
 // --- 1. Welcome / Onboarding Modal ---
-export function showWelcomeModal() {
+export function showWelcomeModal(incomingRefCode = null) {
   const container = getModalContainer();
   if (!container) return;
+
+  // If user came via referral link, show that as pre-filled
+  const hasAutoRef = !!incomingRefCode;
+  const refPlaceholder = hasAutoRef ? incomingRefCode : 'Enter Referral Code (e.g. ref_abc1234)';
 
   container.innerHTML = `
     <div class="glass-card modal-card">
       <div class="modal-icon-hero"><img src="/shovel_logo.png" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; filter: drop-shadow(0 0 20px var(--accent-gold));" /></div>
       <div class="modal-title">Welcome to Shovel Wallet!</div>
       <div class="modal-text">
-        Dig & Mine <b>$SHOVEL</b> points, swap real multi-crypto assets (TON, USDT, BTC, ETH, SOL, BNB, NOT, DOGS), invite friends & climb the leaderboard!
+        Dig &amp; Mine <b>$SHOVEL</b> points, swap multi-crypto assets (TON, USDT, BTC, ETH, SOL, BNB, NOT, DOGS), invite friends &amp; climb the leaderboard!
         <br><br>
-        <div style="background: rgba(255, 215, 0, 0.1); border: 1px solid var(--accent-gold); padding: 8px; border-radius: 8px; font-size: 0.8rem; color: var(--accent-gold);">
-          🎁 Enter Referral Code for <b>1,000 SHOVEL Points</b>! (Without code: 200 Points)
-        </div>
+        ${hasAutoRef
+          ? `<div style="background: rgba(16, 185, 129, 0.12); border: 1px solid var(--accent-green); padding: 10px; border-radius: 8px; font-size: 0.82rem; color: var(--accent-green); font-weight: 600;">
+               🎉 Referral link detected! You will receive <b>1,000 SHOVEL</b> bonus!
+             </div>`
+          : `<div style="background: rgba(212, 160, 0, 0.08); border: 1px solid var(--accent-gold); padding: 8px; border-radius: 8px; font-size: 0.8rem; color: var(--accent-gold);">
+               🎁 Have a referral code? Get <b>1,000 SHOVEL</b>! (No code: 200 Points)
+             </div>`
+        }
       </div>
 
+      ${!hasAutoRef ? `
       <div style="width: 100%;">
-        <input type="text" id="welcome-ref-input" placeholder="Enter Referral Code (e.g. ref_shovel99281)" 
-          style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #f1f5f9; color: white; margin-bottom: 12px;" />
+        <input type="text" id="welcome-ref-input" placeholder="${refPlaceholder}"
+          style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.15); background: #f1f5f9; color: #0f172a; margin-bottom: 12px; font-size: 0.85rem;" />
       </div>
+      ` : ''}
 
       <button class="modal-close-btn" id="start-mining-btn">
-        🚀 Claim Welcome Bonus & Start!
+        ${hasAutoRef ? '🚀 Claim 1,000 SHOVEL & Start!' : '🚀 Claim Welcome Bonus & Start!'}
       </button>
     </div>
   `;
@@ -284,12 +295,15 @@ export function showWelcomeModal() {
 
   container.querySelector('#start-mining-btn')?.addEventListener('click', () => {
     soundEngine.playSwapSuccess();
-    const refCode = container.querySelector('#welcome-ref-input')?.value?.trim();
-    const hasRef = refCode && refCode.length > 0;
-    
+    // If auto-ref from link → use it; else check manual input
+    let hasRef = hasAutoRef;
+    if (!hasAutoRef) {
+      const manualCode = container.querySelector('#welcome-ref-input')?.value?.trim();
+      hasRef = manualCode && manualCode.startsWith('ref_') && manualCode.length > 4;
+    }
     const bonus = store.completeOnboarding(hasRef);
     hideModal();
-    showToast(`🎁 Claimed +${bonus} SHOVEL ${hasRef ? 'Referral' : 'Welcome'} Bonus!`);
+    showToast(`🎁 Claimed +${bonus.toLocaleString()} SHOVEL ${hasRef ? 'Referral' : 'Welcome'} Bonus!`);
   });
 }
 

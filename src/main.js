@@ -7,7 +7,7 @@
    ========================================================================== */
 
 import './style.css';
-import { store } from './state.js';
+import { store, getReferralCodeFromTelegram } from './state.js';
 import { ParticleEngine } from './particles.js';
 import { renderHeader } from './components/Header.js';
 import { renderNavigation } from './components/Navigation.js';
@@ -24,22 +24,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const particleCanvas = document.getElementById('particle-canvas');
   const particleEngine = new ParticleEngine(bgCanvas, particleCanvas);
 
-  // 2. Initialize Telegram WebApp SDK & Real TonConnect SDK
+  // 2. Initialize Telegram WebApp SDK FIRST (needed to get User ID)
   initTelegramWebApp();
+
+  // 3. NOW initialize per-user state store (uses Telegram User ID as key)
+  store.initForUser();
+
+  // 4. Initialize TonConnect
   initTonConnect();
 
-  // 3. Cache Core Shell DOM Elements
+  // 5. Cache Core Shell DOM Elements
   const headerContainer = document.getElementById('app-header');
   const viewportContainer = document.getElementById('app-viewport');
   const navContainer = document.getElementById('app-nav');
 
-  // 4. Initial Background Theme Application
+  // 6. Initial Background Theme Application
   applyBgThemeToDOM(store.getState().currentBgTheme || 'theme_bg4');
 
-  // 5. Track the last rendered tab so we only re-render shell when tab changes
+  // 7. Check if user came via referral link
+  const incomingRefCode = getReferralCodeFromTelegram();
+
+  // 8. Track the last rendered tab so we only re-render shell when tab changes
   let lastRenderedTab = null;
 
-  // 6. Main View Router Function
+  // 9. Main View Router Function
   function renderApp(state) {
     const currentTab = state.activeTab;
 
@@ -73,27 +81,26 @@ document.addEventListener('DOMContentLoaded', () => {
       viewportContainer.scrollTop = 0;
     }
     // If tab hasn't changed, MiningScreen handles its own 1-second tick updates
-    // internally via setInterval — no DOM rebuild needed here.
 
     // Trigger Welcome / Onboarding Modal if new user (only once)
     if (!state.onboarded && !window._onboardingShown) {
       window._onboardingShown = true;
       setTimeout(() => {
-        showWelcomeModal();
+        // Pass referral code → if user came via link they get 1000 SHOVEL
+        showWelcomeModal(incomingRefCode);
       }, 500);
     }
   }
 
-  // 7. Subscribe to State Changes
+  // 10. Subscribe to State Changes
   store.subscribe((state) => {
     renderApp(state);
   });
 
-  // 8. Initial First Render
+  // 11. Initial First Render
   renderApp(store.getState());
 
-  // 9. Monetag In-App Interstitial — auto-shows 2 ads (5s delay, 30s interval)
-  // Only runs inside Telegram where SDK is loaded
+  // 12. Monetag In-App Interstitial — auto-shows 2 ads (5s delay, 30s interval)
   setTimeout(() => {
     startMonetagInAppInterstitial();
   }, 6000);
@@ -104,7 +111,7 @@ function initTelegramWebApp() {
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-    
+
     // Customize Telegram Header Color
     try {
       tg.setHeaderColor('#ffffff');

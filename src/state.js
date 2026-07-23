@@ -1,93 +1,173 @@
 /* ==========================================================================
-   CENTRAL REACTIVE STATE STORE & LOCALSTORAGE PERSISTENCE (SHOVEL WALLET V5)
+   CENTRAL REACTIVE STATE STORE — PER-USER ISOLATION via Telegram User ID
+   
+   FIX: Each Telegram user gets their OWN localStorage key so data is
+   100% separate. New users start fresh (0 balances + 2 USDT).
+   Referral bonus = 1000 SHOVEL. No fake demo data.
    ========================================================================== */
 
-const STORAGE_KEY = 'SHOVEL_WALLET_STATE_V5';
+// --- Get Telegram User ID safely (fallback to 'guest' for browser testing) ---
+function getTelegramUserId() {
+  try {
+    const tg = window.Telegram?.WebApp;
+    const userId = tg?.initDataUnsafe?.user?.id;
+    if (userId) return String(userId);
+  } catch (_) {}
+  return 'guest_browser';
+}
 
-const initialDefaultState = {
-  onboarded: false,
-  activeTab: 'mining', // 'mining' | 'swap' | 'referrals' | 'portfolio'
-  currentBgTheme: 'theme_bg4', // Theme 4: Cyber Molten Magma Core (Default Theme)
-  user: {
+// --- Get Referral Code from Telegram start_param (deep link) ---
+export function getReferralCodeFromTelegram() {
+  try {
+    const tg = window.Telegram?.WebApp;
+    const startParam = tg?.initDataUnsafe?.start_param; // e.g. "ref_abc12345"
+    if (startParam && startParam.startsWith('ref_')) return startParam;
+  } catch (_) {}
+  // Also check URL hash fallback (for browser testing: ?ref=ref_abc12345)
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref && ref.startsWith('ref_')) return ref;
+  return null;
+}
+
+// --- Get Telegram User Info ---
+function getTelegramUserInfo() {
+  try {
+    const tg = window.Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user;
+    if (user) {
+      const firstName = user.first_name || '';
+      const lastName = user.last_name || '';
+      const username = user.username ? `@${user.username}` : `@user${user.id}`;
+      return {
+        name: `${firstName} ${lastName}`.trim() || username,
+        username,
+        avatarUrl: '/shovel_logo.png',
+        streak: 0,
+        rank: 9999,
+        isVip: false
+      };
+    }
+  } catch (_) {}
+  return null;
+}
+
+// --- Generate unique referral code for a user ---
+function generateRefCode(userId) {
+  return `ref_${userId}`;
+}
+
+// --- Fresh state for a brand-new user (0 balances except 2 USDT) ---
+function createFreshState(userId) {
+  const tgUser = getTelegramUserInfo();
+  const userInfo = tgUser || {
     name: 'ShovelMiner',
-    username: '@shovelminer',
+    username: `@user${userId}`,
     avatarUrl: '/shovel_logo.png',
-    streak: 7,
-    rank: 42,
+    streak: 0,
+    rank: 9999,
     isVip: false
-  },
-  tonWallet: {
-    connected: false,
-    address: null,
-    walletName: null
-  },
-  balances: {
-    SHOVEL: 12450.00,
-    TON: 2.45,
-    USDT: 12.50,
-    BTC: 0.00045,
-    ETH: 0.018,
-    SOL: 0.42,
-    BNB: 0.12,
-    NOT: 18500.00,
-    DOGS: 65000.00
-  },
-  autoMining: {
-    active: false,
-    startTime: 0,
-    endTime: 0,
-    sessionHours: 3, // Default 3 hours (upgrades to 6 hours!)
-    ratePerHour: 1.0, // 1 SHOVEL per hour
-    boostMultiplier: 1.0,
-    boostEnd: 0
-  },
-  faucetLastClaimedAt: 0, // Timestamp for 24h limit
-  totalSwapsCount: 0,     // Total swap transactions counter
-  tasksClaimed: {
-    task1: false, // 1,000 swaps -> Mining Boost
-    task2: false, // 10,000 swaps -> 6 Hours Mining Upgrade
-    task3: false  // 100,000 swaps -> VIP Member Status
-  },
-  referrals: {
-    totalInvites: 18,
-    earnedMine: 9000,
-    code: 'ref_shovel99281',
-    friends: [
-      { name: 'Rahul S.', username: '@rahul_crypto', status: 'Active Miner', bonus: '+500 SHOVEL' },
-      { name: 'Sarah K.', username: '@sarah_web3', status: 'Mined 4.2k', bonus: '+500 SHOVEL' },
-      { name: 'Alex M.', username: '@alex_dev', status: 'Joined', bonus: '+250 SHOVEL' },
-      { name: 'Dmitry P.', username: '@dmitry_ton', status: 'Active Miner', bonus: '+500 SHOVEL' }
+  };
+
+  return {
+    onboarded: false,
+    activeTab: 'mining',
+    currentBgTheme: 'theme_bg4',
+    user: userInfo,
+    tonWallet: {
+      connected: false,
+      address: null,
+      walletName: null
+    },
+    balances: {
+      SHOVEL: 0,
+      TON: 0,
+      USDT: 2.00,   // ← Every new user gets 2 USDT
+      BTC: 0,
+      ETH: 0,
+      SOL: 0,
+      BNB: 0,
+      NOT: 0,
+      DOGS: 0
+    },
+    autoMining: {
+      active: false,
+      startTime: 0,
+      endTime: 0,
+      sessionHours: 3,
+      ratePerHour: 1.0,
+      boostMultiplier: 1.0,
+      boostEnd: 0
+    },
+    faucetLastClaimedAt: 0,
+    totalSwapsCount: 0,
+    tasksClaimed: {
+      task1: false,
+      task2: false,
+      task3: false
+    },
+    referrals: {
+      totalInvites: 0,
+      earnedMine: 0,
+      code: generateRefCode(userId),
+      friends: []
+    },
+    transactions: [
+      {
+        type: 'FAUCET',
+        title: 'Welcome Bonus — 2 USDT',
+        amount: '+2.00 USDT',
+        time: 'Just now',
+        isPositive: true
+      }
     ]
-  },
-  transactions: [
-    { type: 'MINE', title: '3H Auto-Mining Yield', amount: '+3.00 SHOVEL', time: '10m ago', isPositive: true },
-    { type: 'SWAP', title: 'Swap SHOVEL ➔ TON (Fee: 0.1 SHOVEL)', amount: '-1,000 SHOVEL / +0.15 TON', time: '1h ago', isPositive: true },
-    { type: 'FAUCET', title: 'Testnet Faucet Deposit', amount: '+1.00 TON', time: '5h ago', isPositive: true }
-  ]
-};
+  };
+}
 
 class StateStore {
   constructor() {
     this.listeners = [];
-    this.state = this.loadState();
-    this.startMiningTickLoop();
+    this._userId = null;    // Set on first init via initForUser()
+    this._storageKey = null;
+    this.state = null;
   }
 
-  loadState() {
+  // Call this AFTER Telegram WebApp SDK is ready
+  initForUser() {
+    this._userId = getTelegramUserId();
+    this._storageKey = `SHOVEL_WALLET_${this._userId}_V6`;
+    this.state = this._loadState();
+    this.startMiningTickLoop();
+    return this;
+  }
+
+  _loadState() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(this._storageKey);
       if (saved) {
-        return { ...initialDefaultState, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        // Merge: keep saved data but ensure all keys exist from fresh state
+        const fresh = createFreshState(this._userId);
+        return {
+          ...fresh,
+          ...parsed,
+          balances: { ...fresh.balances, ...parsed.balances },
+          autoMining: { ...fresh.autoMining, ...parsed.autoMining },
+          referrals: { ...fresh.referrals, ...parsed.referrals },
+          tasksClaimed: { ...fresh.tasksClaimed, ...parsed.tasksClaimed },
+          user: { ...fresh.user, ...parsed.user }
+        };
       }
     } catch (e) {
       console.warn('Failed to load state from localStorage:', e);
     }
-    return { ...initialDefaultState };
+    // Brand new user
+    return createFreshState(this._userId);
   }
 
   saveState() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+      localStorage.setItem(this._storageKey, JSON.stringify(this.state));
     } catch (e) {
       console.warn('Failed to save state:', e);
     }
@@ -122,7 +202,7 @@ class StateStore {
     this.saveState();
   }
 
-  connectTonWallet(walletName = 'Tonkeeper', address = 'EQBvW89xK_Shovel_7F9k') {
+  connectTonWallet(walletName = 'Tonkeeper', address = null) {
     this.state.tonWallet.connected = true;
     this.state.tonWallet.walletName = walletName;
     this.state.tonWallet.address = address;
@@ -136,13 +216,15 @@ class StateStore {
     this.saveState();
   }
 
+  // hasRefCode: true = user came via referral link → 1000 SHOVEL bonus
+  // hasRefCode: false = normal signup → 200 SHOVEL welcome bonus
   completeOnboarding(hasRefCode = false) {
     this.state.onboarded = true;
     const bonus = hasRefCode ? 1000 : 200;
     this.state.balances.SHOVEL += bonus;
     this.state.transactions.unshift({
       type: 'MINE',
-      title: hasRefCode ? 'Referral Onboarding Bonus' : 'Welcome Onboarding Bonus',
+      title: hasRefCode ? '🎉 Referral Bonus — Welcome Gift' : '🎉 Welcome Bonus',
       amount: `+${bonus} SHOVEL`,
       time: 'Just now',
       isPositive: true
@@ -168,7 +250,7 @@ class StateStore {
     const durationMs = (mining.sessionHours || 3) * 3600 * 1000;
     const elapsedMs = Math.min(now - mining.startTime, durationMs);
     const hoursElapsed = elapsedMs / (1000 * 3600);
-    
+
     const isBoostActive = mining.boostEnd > now;
     let rate = mining.ratePerHour;
     if (isBoostActive) rate *= 2.0;
@@ -284,19 +366,35 @@ class StateStore {
     return { success: false, reason: 'Milestone target not reached yet' };
   }
 
+  // Credit referral invite (called when a friend joins via your link)
+  recordReferralInvite(friendName, friendUsername) {
+    this.state.referrals.totalInvites += 1;
+    this.state.referrals.earnedMine += 500;
+    this.state.balances.SHOVEL += 500;
+    this.state.referrals.friends.unshift({
+      name: friendName,
+      username: friendUsername,
+      status: 'Joined',
+      bonus: '+500 SHOVEL'
+    });
+    this.state.transactions.unshift({
+      type: 'MINE',
+      title: `Referral Bonus — ${friendName} joined`,
+      amount: '+500 SHOVEL',
+      time: 'Just now',
+      isPositive: true
+    });
+    this.saveState();
+  }
+
   startMiningTickLoop() {
     setInterval(() => {
       const now = Date.now();
       const mining = this.state.autoMining;
-
       if (mining.active) {
         if (now >= mining.endTime) {
           this.claimMiningYield();
         }
-        // DO NOT call this.notify() here!
-        // MiningScreen handles its own 1-second tick updates internally.
-        // Calling notify() here was causing full DOM re-renders every second,
-        // which destroyed the navigation bar and broke scroll position.
       }
     }, 1000);
   }
