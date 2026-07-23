@@ -151,6 +151,7 @@ export function renderReferralScreen(container) {
           </span>
         </div>
       `}
+      <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
     `;
 
     // Tab Switches

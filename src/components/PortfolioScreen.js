@@ -109,6 +109,7 @@ export function renderPortfolioScreen(container) {
         </div>
       `).join('')}
     </div>
+    <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
   `;
 
   // Faucet Trigger Listener

@@ -220,8 +220,7 @@ html, body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   touch-action: pan-y pinch-zoom;
-  /* nav=58px + safe-area + 36px buffer */
-  padding: 10px 12px calc(58px + env(safe-area-inset-bottom, 0px) + 36px) 12px;
+  padding: 10px 12px 110px 12px;
   position: relative;
   scroll-behavior: smooth;
 }
@@ -241,11 +240,10 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-bottom: 20px;
+  padding-bottom: 60px;
   width: 100%;
   max-width: 100%;
   overflow: visible;
-  /* No animation opacity trick — causes invisible content bug */
   opacity: 1;
 }
 

@@ -142,6 +142,9 @@ export function renderMiningScreen(container, particleEngine) {
         </div>
       `}).join('')}
     </div>
+
+    <!-- Bottom spacer: ensures last panel clears the fixed nav bar on ALL devices -->
+    <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
   `;
 
   // Attach Click Listener to Main Mining Button

@@ -164,8 +164,9 @@ export function renderSwapScreen(container) {
           <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
             <div style="width: ${Math.min(swapsCount / 1000, 100)}%; height: 100%; background: var(--accent-purple); border-radius: 4px; transition: width 0.3s;"></div>
           </div>
-        </div>
       </div>
+    </div>
+    <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
     `;
 
     // Input Listener
