@@ -12,6 +12,9 @@
 const BOT_TOKEN = '8814956227:AAEtC3kl2Gk0r3AtUshdfx0pwqkGo0kIMo4';
 const TG_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
+// Test payment provider token (BotFather /approve)
+const PAYMENT_PROVIDER_TOKEN = 'a436e720ad4719888f432bb76c214eedbc9d091e:qwerty';
+
 export default async function handler(req, res) {
   // Only accept POST from Telegram
   if (req.method !== 'POST') {

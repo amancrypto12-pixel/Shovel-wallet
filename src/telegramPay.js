@@ -8,6 +8,10 @@
 const BOT_TOKEN = '8814956227:AAEtC3kl2Gk0r3AtUshdfx0pwqkGo0kIMo4';
 const BOT_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
+// Test payment provider token (from BotFather /approve)
+// Empty string "" for real Telegram Stars (XTR) in production
+const PAYMENT_PROVIDER_TOKEN = 'a436e720ad4719888f432bb76c214eedbc9d091e:qwerty';
+
 // Product definitions — prices in Telegram Stars
 export const STAR_PRODUCTS = {
   ads_free_lifetime: {
@@ -88,9 +92,9 @@ export async function purchaseWithStars(productKey, onSuccess) {
         title: product.title,
         description: product.description,
         payload: payload,
-        currency: 'XTR',           // ← Telegram Stars currency code
+        currency: 'XTR',                    // Telegram Stars currency
         prices: [{ label: product.title, amount: product.stars }],
-        provider_token: ''          // Empty for Stars (no payment provider needed)
+        provider_token: PAYMENT_PROVIDER_TOKEN  // Test token from BotFather
       })
     });
 
