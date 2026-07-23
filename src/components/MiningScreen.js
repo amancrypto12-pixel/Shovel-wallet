@@ -36,9 +36,9 @@ export function renderMiningScreen(container, particleEngine) {
       <div class="mining-outer-glow"></div>
 
       <!-- Circular SVG Progress Ring -->
-      <svg class="cooldown-svg" viewBox="0 0 175 175">
-        <circle class="cooldown-circle-bg" cx="87.5" cy="87.5" r="72" fill="none" />
-        <circle class="cooldown-circle-progress" id="session-progress-ring" cx="87.5" cy="87.5" r="72" fill="none" 
+      <svg class="cooldown-svg" viewBox="0 0 155 155">
+        <circle class="cooldown-circle-bg" cx="77.5" cy="77.5" r="62" fill="none" />
+        <circle class="cooldown-circle-progress" id="session-progress-ring" cx="77.5" cy="77.5" r="62" fill="none" 
           stroke="${isMiningActive ? 'var(--accent-teal)' : 'var(--accent-gold)'}" />
       </svg>
 

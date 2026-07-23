@@ -220,8 +220,8 @@ html, body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   touch-action: pan-y pinch-zoom;
-  /* 140px = nav bar 65px + safe area 75px so last panel fully visible */
-  padding: 10px 12px 140px 12px;
+  /* nav=58px + safe-area + 36px buffer */
+  padding: 10px 12px calc(58px + env(safe-area-inset-bottom, 0px) + 36px) 12px;
   position: relative;
   scroll-behavior: smooth;
 }
@@ -241,18 +241,17 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-bottom: 40px;
+  padding-bottom: 20px;
   width: 100%;
   max-width: 100%;
   overflow: visible;
-  animation: screen-fade-in 0.2s ease forwards;
+  /* No animation opacity trick — causes invisible content bug */
+  opacity: 1;
 }
 
 @keyframes screen-fade-in {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ==========================================================================
@@ -308,13 +307,13 @@ html, body {
 /* Central Mining Device Ring & Tap Button */
 .mining-hero-container {
   position: relative;
-  width: 175px;
-  height: 175px;
+  width: 155px;
+  height: 155px;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Reduced margin so it doesn't overlap cards below */
-  margin: 2px 0 6px 0;
+  margin: 0 0 4px 0;
+  flex-shrink: 0;
 }
 
 .mining-outer-ring {
@@ -339,12 +338,12 @@ html, body {
 
 .mining-tap-btn {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #2a2512 0%, #121008 60%, #050402 100%);
   border: 4px solid var(--accent-gold);
-  box-shadow: inset 0 0 22px rgba(255, 215, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.5);
+  box-shadow: inset 0 0 18px rgba(255, 215, 0, 0.4), 0 0 24px rgba(255, 215, 0, 0.5);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -395,8 +394,8 @@ html, body {
 
 .cooldown-circle-progress {
   stroke-width: 5;
-  stroke-dasharray: 450;
-  stroke-dashoffset: 450;
+  stroke-dasharray: 390;
+  stroke-dashoffset: 390;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s linear;
 }
@@ -1170,14 +1169,16 @@ html, body {
   right: 0;
   max-width: 480px;
   margin: 0 auto;
-  height: 58px;
+  /* Height accounts for safe area on notched phones */
+  height: calc(58px + env(safe-area-inset-bottom, 0px));
+  min-height: 58px;
   background: rgba(255, 255, 255, 0.97);
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 6px;
   z-index: 150;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
