@@ -8,9 +8,8 @@
 const BOT_TOKEN = '8814956227:AAEtC3kl2Gk0r3AtUshdfx0pwqkGo0kIMo4';
 const BOT_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-// Test payment provider token (from BotFather /approve)
-// Empty string "" for real Telegram Stars (XTR) in production
-const PAYMENT_PROVIDER_TOKEN = 'a436e720ad4719888f432bb76c214eedbc9d091e:qwerty';
+// Payment provider token (from BotFather /approve)
+const PAYMENT_PROVIDER_TOKEN = '2092df2ca231f9047dd3abfbbf9833bbb275d7a6:CODE';
 
 // Product definitions — prices in Telegram Stars
 export const STAR_PRODUCTS = {
