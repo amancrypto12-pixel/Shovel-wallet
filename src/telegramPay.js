@@ -1,15 +1,14 @@
 /* ==========================================================================
    TELEGRAM STARS PAYMENT UTILITY (Shovel Wallet)
    
-   Real Telegram Stars (XTR) payments via Bot API + WebApp openInvoice.
-   Bot Token is used to create invoice links server-side style.
+   BUG-01 FIX: Bot Token moved to backend (/api/create-invoice.js).
+   BUG-02 FIX: provider_token removed — not needed for Telegram Stars (XTR).
+   BUG-18 FIX: Loading state added on buy button during invoice creation.
    ========================================================================== */
 
-const BOT_TOKEN = '8814956227:AAEtC3kl2Gk0r3AtUshdfx0pwqkGo0kIMo4';
-const BOT_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
+// Invoice creation is now handled server-side via /api/create-invoice
+// BOT_TOKEN is NEVER in frontend code
 
-// Payment provider token (from BotFather /approve)
-const PAYMENT_PROVIDER_TOKEN = '2092df2ca231f9047dd3abfbbf9833bbb275d7a6:CODE';
 
 // Product definitions — prices in Telegram Stars
 export const STAR_PRODUCTS = {
@@ -91,20 +90,33 @@ export async function purchaseWithStars(productKey, onSuccess) {
     return;
   }
 
+  // BUG-18 FIX: Show loading state on all ⭐ buy buttons during API call
+  const allBuyBtns = document.querySelectorAll(`.stars-buy-btn[data-product="${productKey}"]`);
+  allBuyBtns.forEach(btn => {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  });
+
+  const restoreBtns = () => {
+    allBuyBtns.forEach(btn => {
+      btn.disabled = false;
+      btn.innerHTML = `⭐ ${product.stars.toLocaleString()}`;
+    });
+  };
+
   try {
-    // Step 1: Create invoice link via Bot API (Telegram Stars = currency XTR)
+    // Step 1: Create invoice link via secure backend API (BOT_TOKEN never in frontend)
     const payload = JSON.stringify({ productKey, userId: tg.initDataUnsafe?.user?.id || 'unknown' });
 
-    const res = await fetch(`${BOT_API}/createInvoiceLink`, {
+    const res = await fetch('/api/create-invoice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: product.title,
         description: product.description,
         payload: payload,
-        currency: 'XTR',                    // Telegram Stars currency
-        prices: [{ label: product.title, amount: product.stars }],
-        provider_token: PAYMENT_PROVIDER_TOKEN  // Test token from BotFather
+        stars: product.stars
+        // provider_token intentionally omitted — not needed for Telegram Stars XTR
       })
     });
 
@@ -112,6 +124,7 @@ export async function purchaseWithStars(productKey, onSuccess) {
 
     if (!data.ok || !data.result) {
       console.error('Invoice creation failed:', data);
+      restoreBtns();
       if (tg.showAlert) {
         tg.showAlert('⚠️ Could not create payment link. Please try again.');
       }
@@ -130,11 +143,12 @@ export async function purchaseWithStars(productKey, onSuccess) {
       } else if (status === 'failed') {
         if (tg.showAlert) tg.showAlert('⚠️ Payment failed. Please try again.');
       }
+      restoreBtns(); // Always restore button after invoice closes
     });
 
   } catch (err) {
     console.error('Stars payment error:', err);
-    const tg = window.Telegram?.WebApp;
+    restoreBtns();
     if (tg?.showAlert) tg.showAlert('⚠️ Network error. Please try again.');
   }
 }

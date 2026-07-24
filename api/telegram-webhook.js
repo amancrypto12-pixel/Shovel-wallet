@@ -9,11 +9,12 @@
    https://your-app.vercel.app/api/telegram-webhook
    ========================================================================== */
 
-const BOT_TOKEN = '8814956227:AAEtC3kl2Gk0r3AtUshdfx0pwqkGo0kIMo4';
+// BUG-01 FIX: Use environment variable in production — set BOT_TOKEN in Vercel dashboard
+const BOT_TOKEN = process.env.BOT_TOKEN || '8814956227:AAEtC3kl2Gk0r3AtUshdfx0pwqkGo0kIMo4';
 const TG_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-// Payment provider token (BotFather /approve)
-const PAYMENT_PROVIDER_TOKEN = '2092df2ca231f9047dd3abfbbf9833bbb275d7a6:CODE';
+// Note: PAYMENT_PROVIDER_TOKEN is NOT needed for Telegram Stars (XTR currency)
+// BUG-02 FIX: Removed invalid provider token — Stars payments don't require it
 
 export default async function handler(req, res) {
   // Only accept POST from Telegram

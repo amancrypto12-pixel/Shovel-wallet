@@ -50,43 +50,45 @@ document.addEventListener('DOMContentLoaded', () => {
   // 9. Main View Router Function
   function renderApp(state) {
     const currentTab = state.activeTab;
+    const tabChanged = lastRenderedTab !== currentTab;
 
-    // Only re-render header & navigation when the active tab actually changes
-    if (lastRenderedTab !== currentTab) {
+    // ── Only re-render header & navigation when the active tab actually changes ──
+    if (tabChanged) {
       renderHeader(headerContainer);
       renderNavigation(navContainer);
       applyBgThemeToDOM(state.currentBgTheme || 'theme_bg4');
       lastRenderedTab = currentTab;
-
-      // Route active tab — full screen render
-      switch (currentTab) {
-        case 'mining':
-          renderMiningScreen(viewportContainer, particleEngine);
-          break;
-        case 'swap':
-          renderSwapScreen(viewportContainer);
-          break;
-        case 'referrals':
-          renderReferralScreen(viewportContainer);
-          break;
-        case 'portfolio':
-          renderPortfolioScreen(viewportContainer);
-          break;
-        default:
-          renderMiningScreen(viewportContainer, particleEngine);
-          break;
-      }
-
       // Scroll viewport to top on tab switch
       viewportContainer.scrollTop = 0;
     }
-    // If tab hasn't changed, MiningScreen handles its own 1-second tick updates
+
+    // ── Always re-render active SCREEN CONTENT on every state change ──
+    // Mining is excluded — it manages its own 1-second interval timer internally.
+    // All other screens must re-render to show immediate state updates
+    // (swap progression, portfolio balance, referral stats, etc.)
+    switch (currentTab) {
+      case 'mining':
+        // Only render mining screen when tab changes — its own timer handles tick updates
+        if (tabChanged) renderMiningScreen(viewportContainer, particleEngine);
+        break;
+      case 'swap':
+        renderSwapScreen(viewportContainer);
+        break;
+      case 'referrals':
+        renderReferralScreen(viewportContainer);
+        break;
+      case 'portfolio':
+        renderPortfolioScreen(viewportContainer);
+        break;
+      default:
+        if (tabChanged) renderMiningScreen(viewportContainer, particleEngine);
+        break;
+    }
 
     // Trigger Welcome / Onboarding Modal if new user (only once)
     if (!state.onboarded && !window._onboardingShown) {
       window._onboardingShown = true;
       setTimeout(() => {
-        // Pass referral code → if user came via link they get 1000 SHOVEL
         showWelcomeModal(incomingRefCode);
       }, 500);
     }
@@ -96,8 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
   store.subscribe((state) => {
     renderApp(state);
 
-    // Always sync header balance pill on EVERY state change (mining ticks, swaps, purchases)
-    // This fixes the stale balance bug (header showed old value after mining yield)
+    // Sync header balance pill on EVERY state change (mining ticks, swaps, purchases)
     const balancePill = document.querySelector('.balance-amount');
     if (balancePill) {
       balancePill.textContent = state.balances.SHOVEL.toLocaleString(undefined, {
@@ -105,34 +106,19 @@ document.addEventListener('DOMContentLoaded', () => {
         maximumFractionDigits: 2
       });
     }
-
-    // Also live-update Swap screen balance labels when on swap tab
-    // (fixes the "From balance shows 16, header shows 8" mismatch)
-    if (state.activeTab === 'swap') {
-      const fromBalLbl = document.querySelector('.swap-balance-lbl span');
-      if (fromBalLbl) {
-        // Re-read current fromToken from the selector button text to format correctly
-        const fromTokenEl = document.querySelector('#from-token-btn span');
-        const currentFromToken = fromTokenEl ? fromTokenEl.textContent.trim() : 'SHOVEL';
-        const freshBal = state.balances[currentFromToken] || 0;
-        fromBalLbl.textContent = `${freshBal.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 4
-        })} ${currentFromToken}`;
-      }
-    }
   });
 
   // 11. Initial First Render
   renderApp(store.getState());
 
   // 12. Monetag In-App Interstitial
-  // DELAY: Start 3 minutes after load (not 5 seconds) to avoid conflicting with early swaps.
-  // The swap/payment flows are ad-free by design. The auto-interstitial must not fire
-  // during or immediately after swap actions. window._swapActive flag is also checked.
-  setTimeout(() => {
-    startMonetagInAppInterstitial();
-  }, 180000); // 3 minutes = 180,000ms
+  // BUG-13 FIX: Only fire inside Telegram WebApp — not in browser dev testing
+  // DELAY: 3 minutes after load to avoid conflicting with early swaps.
+  if (window.Telegram?.WebApp) {
+    setTimeout(() => {
+      startMonetagInAppInterstitial();
+    }, 180000); // 3 minutes = 180,000ms
+  }
 });
 
 function initTelegramWebApp() {

@@ -171,6 +171,7 @@ class StateStore {
     this._userId = null;    // Set on first init via initForUser()
     this._storageKey = null;
     this.state = null;
+    this._miningInterval = null; // BUG-03 FIX: Store interval ID to prevent leaks
   }
 
   // Call this AFTER Telegram WebApp SDK is ready
@@ -319,6 +320,17 @@ class StateStore {
       });
     }
 
+    // BUG-12 FIX: Track daily streak
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (this.state.lastClaimedDate === yesterday) {
+      this.state.user.streak = (this.state.user.streak || 0) + 1;
+    } else if (this.state.lastClaimedDate !== today) {
+      // Missed a day — reset streak
+      this.state.user.streak = 1;
+    }
+    this.state.lastClaimedDate = today;
+
     mining.active = false;
     mining.startTime = 0;
     mining.endTime = 0;
@@ -335,8 +347,10 @@ class StateStore {
   applyAdBoost() {
     const now = Date.now();
     const durationMs = (this.state.autoMining.sessionHours || 3) * 3600 * 1000;
-    this.state.autoMining.boostMultiplier = 2.0;
-    this.state.autoMining.boostEnd = now + durationMs;
+    // BUG-07 FIX: Only upgrade boost, never downgrade (protects 3x from monthly_sub)
+    this.state.autoMining.boostMultiplier = Math.max(2.0, this.state.autoMining.boostMultiplier || 1.0);
+    // Extend boost end time (take the maximum of current end or new duration)
+    this.state.autoMining.boostEnd = Math.max(this.state.autoMining.boostEnd || 0, now + durationMs);
     this.saveState();
   }
 
@@ -449,7 +463,10 @@ class StateStore {
   }
 
   startMiningTickLoop() {
-    setInterval(() => {
+    // BUG-03 FIX: Clear any existing interval before creating a new one
+    if (this._miningInterval) clearInterval(this._miningInterval);
+
+    this._miningInterval = setInterval(() => {
       const now = Date.now();
       const mining = this.state.autoMining;
 

@@ -356,8 +356,10 @@ export function renderMiningScreen(container, particleEngine) {
     }
   }
 
-  // Clear any previous timer and start fresh
-  if (miningTimerInterval) clearInterval(miningTimerInterval);
+  // BUG-04 FIX: Null-out then clear to prevent race on rapid re-renders
+  const prevInterval = miningTimerInterval;
+  miningTimerInterval = null;
+  if (prevInterval) clearInterval(prevInterval);
   miningTimerInterval = setInterval(updateTick, 1000);
   updateTick();
 }

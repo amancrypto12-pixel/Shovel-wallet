@@ -8,7 +8,7 @@ const SZ = 'width="34" height="34"';
 export const TOKEN_MAP = {
   SHOVEL: { 
     name: 'Shovel Token', 
-    priceUsd: 0.000225,
+    priceUsd: 0.01,   // $0.01 per token
     svg: `<img src="/shovel_logo.png" width="34" height="34" style="border-radius:50%; object-fit:cover; display:block;" />`
   },
   TON: { 

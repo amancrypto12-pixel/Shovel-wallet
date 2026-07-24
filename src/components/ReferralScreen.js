@@ -66,7 +66,12 @@ export function renderReferralScreen(container) {
         <!-- Invited Friends List -->
         <div class="section-subtitle"><i class="fa-solid fa-users"></i> Recent Team Members</div>
         <div class="glass-card referrals-list-card">
-          ${state.referrals.friends.map(f => `
+          ${state.referrals.friends.length === 0
+            ? `<div style="text-align:center; color:var(--text-secondary); padding: 20px 12px; font-size:0.82rem; line-height:1.5;">
+                 <i class="fa-solid fa-user-group" style="font-size:1.5rem; margin-bottom:8px; display:block; opacity:0.4;"></i>
+                 No team members yet.<br>Invite friends to earn <b style="color:var(--accent-gold);">+500 SHOVEL</b> each!
+               </div>`
+            : state.referrals.friends.map(f => `
             <div class="ref-item-row">
               <div class="ref-user-left">
                 <div class="ref-avatar">${f.name.charAt(0)}</div>
@@ -77,7 +82,8 @@ export function renderReferralScreen(container) {
               </div>
               <div class="ref-bonus-val">${f.bonus}</div>
             </div>
-          `).join('')}
+          `).join('')
+          }
         </div>
       ` : `
         <!-- Leaderboard Filter Chips -->
@@ -154,34 +160,30 @@ export function renderReferralScreen(container) {
       <div style="height: 80px; width: 100%; flex-shrink: 0;" aria-hidden="true"></div>
     `;
 
-    // Tab Switches — use { once: true } to prevent duplicate listener stacking (Bug#6 fix)
+    // BUG-06 FIX: Removed { once: true } — innerHTML replacement already destroys old
+    // listeners. { once: true } caused missed-click on fast double-taps.
     container.querySelector('#subtab-team-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       activeSubTab = 'team';
       renderUI();
-    }, { once: true });
+    });
 
     container.querySelector('#subtab-leaderboard-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       activeSubTab = 'leaderboard';
       renderUI();
-    }, { once: true });
+    });
 
-    // Copy Referral Link — Bug#12 Fix: Telegram WebApp clipboard API + fallback
+    // Copy Referral Link
     container.querySelector('#copy-ref-link-btn')?.addEventListener('click', () => {
       soundEngine.playSwapSuccess();
-      // Try Telegram's built-in clipboard first (works in Mini App)
       try {
-        if (window.Telegram?.WebApp?.version >= '6.4') {
-          // TG 6.4+ supports writing to clipboard natively but no direct API
-          // Use navigator.clipboard with permission check
-        }
         navigator.clipboard.writeText(refLink).catch(() => {});
       } catch (_) {}
       showToast('📋 Referral Link Copied! Share it with friends.');
-    }, { once: true });
+    });
 
-    // Bug#11 Fix: Use openTelegramLink instead of window.open (blocked in Mini App)
+    // Invite via Telegram share (uses openTelegramLink — works inside Mini App)
     container.querySelector('#invite-tg-friends-btn')?.addEventListener('click', () => {
       soundEngine.playSwapSuccess();
       const shareText = encodeURIComponent(`⛏️ Join Shovel Wallet & mine $SHOVEL with me! Get +1,000 bonus SHOVEL:`);
@@ -191,24 +193,24 @@ export function renderReferralScreen(container) {
       } else {
         window.open(tgShareUrl, '_blank');
       }
-    }, { once: true });
+    });
 
-    // Filter Chips — Bug#6 fix: { once: true }
+    // Filter Chips
     container.querySelector('#filter-shovel-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       leaderboardFilter = 'shovel';
       renderUI();
-    }, { once: true });
+    });
     container.querySelector('#filter-ton-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       leaderboardFilter = 'ton';
       renderUI();
-    }, { once: true });
+    });
     container.querySelector('#filter-streak-btn')?.addEventListener('click', () => {
       soundEngine.playTabClick();
       leaderboardFilter = 'streak';
       renderUI();
-    }, { once: true });
+    });
   }
 
   function getScoreDisp(item) {

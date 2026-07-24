@@ -10,13 +10,16 @@ import { showConfirmSwapModal, showTokenPickerModal, showToast } from './Modals.
 
 export { TOKEN_MAP };
 
-export function renderSwapScreen(container) {
-  const state = store.getState();
-  container.className = 'screen swap-screen';
+// ── Module-level state: persists across re-renders ──
+// These are outside renderSwapScreen so that when renderApp() calls
+// renderSwapScreen() again on state changes, the user's token selection
+// and entered amount are preserved (not reset to defaults).
+let fromToken = 'SHOVEL';
+let toToken = 'TON';
+let fromAmount = 100;
 
-  let fromToken = 'SHOVEL';
-  let toToken = 'TON';
-  let fromAmount = 100;
+export function renderSwapScreen(container) {
+  container.className = 'screen swap-screen';
 
   function calculateRate(fromSym, toSym) {
     const pFrom = TOKEN_MAP[fromSym]?.priceUsd || 1;
@@ -206,8 +209,9 @@ export function renderSwapScreen(container) {
       updateSwapState(e.target.value);
     });
 
-    // Preset Percentage Chips
-    container.querySelectorAll('.preset-chip').forEach(chip => {
+    // BUG-05 FIX: Use [data-pct] selector to ONLY target percentage chips,
+    // not the task claim buttons that also use .preset-chip class
+    container.querySelectorAll('[data-pct]').forEach(chip => {
       chip.addEventListener('click', () => {
         soundEngine.playTabClick();
         const pct = parseFloat(chip.dataset.pct);
@@ -300,9 +304,11 @@ export function renderSwapScreen(container) {
     });
 
     // Task 0 Claim — 5 swaps → 50 SHOVEL
+    // BUG-09 FIX: Read fresh state from store (not stale closure)
     container.querySelector('#claim-task0-btn')?.addEventListener('click', () => {
       soundEngine.playSwapSuccess();
-      if (!liveState.tasksClaimed?.task0 && liveState.totalSwapsCount >= 5) {
+      const freshState = store.getState();
+      if (!freshState.tasksClaimed?.task0 && freshState.totalSwapsCount >= 5) {
         store.state.tasksClaimed = { ...store.state.tasksClaimed, task0: true };
         store.state.balances.SHOVEL += 50;
         store.state.transactions.unshift({ type: 'MINE', title: '🎁 Swap Task 0 Reward', amount: '+50 SHOVEL', time: 'Just now', isPositive: true });
@@ -335,3 +341,4 @@ export function renderSwapScreen(container) {
 
   renderUI();
 }
+

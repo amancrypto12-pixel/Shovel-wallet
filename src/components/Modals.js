@@ -147,7 +147,8 @@ export function showTonWalletDetailsModal() {
       </div>
       <div class="modal-title">TON Wallet Connected</div>
       
-      <div style="width: 100%; background: #f1f5f9; padding: 12px; border-radius: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px;">
+      <!-- BUG-17 FIX: Use dark glass background instead of light #f1f5f9 -->
+      <div style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
           <span style="color: var(--text-secondary);">Provider:</span>
           <b style="color: white;">${tw.walletName || 'TON Wallet'}</b>
@@ -248,8 +249,22 @@ export function showThemePickerModal() {
 }
 
 export function applyBgThemeToDOM(themeId) {
-  // Background themes disabled — solid dark background for clean UI
-  // No background image to prevent visual bleed-through on glass cards
+  // BUG-11 FIX: Actually apply background theme to the body element
+  const bgMap = {
+    theme_bg1: '/bg_1.jpg',
+    theme_bg2: '/bg_2.jpg',
+    theme_bg3: '/bg_3.jpg',
+    theme_bg4: '/bg_4.jpg'
+  };
+  const imgUrl = bgMap[themeId];
+  if (imgUrl) {
+    document.body.style.backgroundImage = `url(${imgUrl})`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+  } else {
+    document.body.style.backgroundImage = 'none';
+  }
 }
 
 // --- 1. Welcome / Onboarding Modal ---
@@ -415,6 +430,8 @@ export function showRewardedAdModal(onAdComplete) {
   }, 1000);
 
   container.querySelector('#ad-complete-btn')?.addEventListener('click', () => {
+    // BUG-08 FIX: Clear the interval timer before hiding modal to prevent memory leak
+    clearInterval(adTimer);
     soundEngine.playEnergyBoost();
     hideModal();
     if (typeof onAdComplete === 'function') {

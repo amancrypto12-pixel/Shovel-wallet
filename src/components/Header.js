@@ -1,10 +1,10 @@
 /* ==========================================================================
-   GLOBAL HEADER COMPONENT (Shovel Wallet & Live Theme Switcher)
+   GLOBAL HEADER COMPONENT (Shovel Wallet)
+   Theme picker icon removed as per user request.
    ========================================================================== */
 
 import { store } from '../state.js';
 import { soundEngine } from '../audio.js';
-import { showThemePickerModal } from './Modals.js';
 
 export function renderHeader(container) {
   const state = store.getState();
@@ -27,12 +27,8 @@ export function renderHeader(container) {
       </div>
     </div>
 
-    <!-- Right Controls: Theme Switcher & Balance Pill -->
+    <!-- Right Controls: Balance Pill only (theme icon removed) -->
     <div style="display: flex; align-items: center; gap: 8px;">
-      <button id="theme-switcher-btn" style="background: var(--bg-input); border: 1px solid var(--border-glass); color: var(--accent-gold); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem;" title="Switch Background UI Theme">
-        🎨
-      </button>
-
       <div class="header-balance-pill" id="header-balance-pill">
         <img src="/shovel_logo.png" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;" />
         <span class="balance-amount">${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -45,10 +41,5 @@ export function renderHeader(container) {
     soundEngine.playTabClick();
     store.setActiveTab('portfolio');
   });
-
-  // Attach event listener to Theme Switcher button
-  container.querySelector('#theme-switcher-btn')?.addEventListener('click', () => {
-    soundEngine.playTabClick();
-    showThemePickerModal();
-  });
 }
+
