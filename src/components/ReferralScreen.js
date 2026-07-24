@@ -6,12 +6,13 @@ import { store } from '../state.js';
 import { soundEngine } from '../audio.js';
 import { showToast } from './Modals.js';
 
+// Module-level state to persist user's selection across background re-renders
+let activeSubTab = 'team'; // 'team' | 'leaderboard'
+let leaderboardFilter = 'shovel'; // 'shovel' | 'ton' | 'streak'
+
 export function renderReferralScreen(container) {
   const state = store.getState();
   container.className = 'screen referral-screen';
-
-  let activeSubTab = 'team'; // 'team' | 'leaderboard'
-  let leaderboardFilter = 'shovel'; // 'shovel' | 'ton' | 'streak'
 
   const mockLeaderboardData = [
     { rank: 1, name: 'CryptoKing', username: '@cryptoking', score: '245,800 SHOVEL', avatar: '/shovel_logo.png', tonScore: '142.50 TON', streak: 45 },

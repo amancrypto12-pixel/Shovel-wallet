@@ -274,6 +274,12 @@ class StateStore {
       time: 'Just now',
       isPositive: true
     });
+    
+    // Cap transactions to 50 items to prevent localStorage overflow
+    if (this.state.transactions.length > 50) {
+      this.state.transactions = this.state.transactions.slice(0, 50);
+    }
+    
     this.saveState();
     return bonus;
   }
@@ -388,6 +394,11 @@ class StateStore {
       isPositive: true
     });
 
+    // Cap transactions to 50 items to prevent localStorage overflow
+    if (this.state.transactions.length > 50) {
+      this.state.transactions = this.state.transactions.slice(0, 50);
+    }
+
     this.saveState();
     return { success: true };
   }
@@ -409,6 +420,11 @@ class StateStore {
       time: 'Just now',
       isPositive: true
     });
+
+    // Cap transactions to 50 items to prevent localStorage overflow
+    if (this.state.transactions.length > 50) {
+      this.state.transactions = this.state.transactions.slice(0, 50);
+    }
 
     this.saveState();
     return { success: true };
@@ -459,6 +475,12 @@ class StateStore {
       time: 'Just now',
       isPositive: true
     });
+
+    // Cap transactions to 50 items to prevent localStorage overflow
+    if (this.state.transactions.length > 50) {
+      this.state.transactions = this.state.transactions.slice(0, 50);
+    }
+
     this.saveState();
   }
 
